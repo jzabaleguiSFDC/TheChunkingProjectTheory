@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Chunking Project Theory — Doodle</title>
+<style>
+  :root{
+    --paper:#fbf7ec;
+    --ink:#2d2a26;
+    --coral:#e8503a;
+    --blue:#2f6fed;
+    --amber:#f2b01e;
+    --green:#3aa856;
+    --muted:#b9b2a2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Comic Sans MS","Chalkboard SE","Comic Neue","Segoe Print","Bradley Hand",cursive,sans-serif;
+    overflow:hidden;
+    display:flex;flex-direction:column;
+    /* faint paper grid */
+    background-image:
+      linear-gradient(rgba(45,42,38,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45,42,38,.035) 1px, transparent 1px);
+    background-size:26px 26px;
+  }
+  #stage{
+    position:relative;flex:1;min-height:0;
+    display:flex;align-items:center;justify-content:center;
+    padding-bottom:120px; /* reserve room for the caption band */
+  }
+  .scene{
+    position:absolute;inset:0 0 120px 0; /* keep drawings above the caption */
+    display:none;
+    align-items:center;justify-content:center;
+  }
+  .scene.active{display:flex}
+  svg.board{width:min(94vw,1180px);height:auto;max-height:72vh;overflow:visible}
+
+  /* draw-on effect handled via JS (stroke-dashoffset) */
+  .ink{fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+  .thin{stroke-width:3.5}
+  .fat{stroke-width:8}
+  .coral{stroke:var(--coral)}
+  .blue{stroke:var(--blue)}
+  .amber{stroke:var(--amber)}
+  .green{stroke:var(--green)}
+  .muted{stroke:var(--muted)}
+  .fill-none{fill:none}
+
+  text{font-family:inherit;fill:var(--ink)}
+  .t-title{font-size:76px;font-weight:700}
+  .t-big{font-size:120px;font-weight:700}
+  .t-h{font-size:44px;font-weight:700}
+  .t-m{font-size:30px}
+  .t-s{font-size:24px}
+  .tx-coral{fill:var(--coral)}
+  .tx-blue{fill:var(--blue)}
+  .tx-green{fill:var(--green)}
+  .tx-amber{fill:var(--amber)}
+  .tx-muted{fill:var(--muted)}
+  .center{text-anchor:middle}
+
+  /* pop-in for solid elements / text */
+  .pop{opacity:0;transform-box:fill-box;transform-origin:center}
+  .pop.go{animation:pop .55s cubic-bezier(.2,1.4,.4,1) both}
+  @keyframes pop{
+    0%{opacity:0;transform:scale(.4) rotate(-4deg)}
+    100%{opacity:1;transform:scale(1) rotate(0)}
+  }
+  .fade{opacity:0}
+  .fade.go{animation:fade .6s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  /* subtitle / caption bar */
+  #caption{
+    position:fixed;left:50%;bottom:84px;transform:translateX(-50%);
+    z-index:5;
+    max-width:min(90vw,1000px);
+    background:var(--ink);color:var(--paper);
+    padding:12px 26px;border-radius:14px;
+    font-size:clamp(17px,2.3vw,25px);line-height:1.3;text-align:center;
+    box-shadow:4px 5px 0 rgba(45,42,38,.25);
+    opacity:0;transition:opacity .3s ease, transform .3s ease;
+    pointer-events:none;
+  }
+  #caption.show{opacity:1}
+
+  /* controls */
+  #bar{position:relative;height:6px;background:rgba(45,42,38,.12)}
+  #fill{position:absolute;left:0;top:0;height:100%;width:0;background:var(--coral)}
+  #controls{
+    display:flex;align-items:center;gap:14px;justify-content:center;
+    padding:10px;font-size:14px;color:var(--ink);
+  }
+  #controls button{
+    font-family:inherit;font-size:16px;cursor:pointer;
+    background:var(--paper);color:var(--ink);
+    border:3px solid var(--ink);border-radius:10px;
+    padding:6px 14px;box-shadow:2px 3px 0 rgba(45,42,38,.25);
+    transition:transform .08s ease;
+  }
+  #controls button:hover{transform:translateY(-1px)}
+  #controls button:active{transform:translate(1px,2px);box-shadow:1px 1px 0 rgba(45,42,38,.25)}
+  #counter{min-width:70px;text-align:center;color:var(--muted)}
+  .hint{color:var(--muted);font-size:12px}
+
+  /* start gate overlay (unlocks browser audio on first click) */
+  #startgate{
+    position:fixed;inset:0;z-index:50;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(251,247,236,.94);
+    cursor:pointer;transition:opacity .4s ease;
+    background-image:
+      linear-gradient(rgba(45,42,38,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45,42,38,.04) 1px, transparent 1px);
+    background-size:26px 26px;
+  }
+  #startgate.hide{opacity:0;pointer-events:none}
+  .gatebox{text-align:center;transform:rotate(-1.2deg)}
+  .gateicon{font-size:72px;animation:bob 1.8s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .gatetitle{font-size:clamp(30px,5vw,54px);font-weight:700;color:var(--coral);margin:10px 0}
+  .gatehint{font-size:clamp(16px,2.4vw,24px);color:var(--ink);
+    border:3px solid var(--ink);border-radius:14px;padding:10px 22px;display:inline-block;
+    box-shadow:3px 4px 0 rgba(45,42,38,.2);background:#fff}
+</style>
+</head>
+<body>
+
+<!-- shared sketch/wobble filter -->
+<svg width="0" height="0" style="position:absolute">
+  <filter id="sketch" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2"/>
+  </filter>
+</svg>
+
+<div id="startgate">
+  <div class="gatebox">
+    <div class="gateicon">🔊</div>
+    <div class="gatetitle">The Chunking Project Theory</div>
+    <div class="gatehint">Click anywhere to play with narration</div>
+  </div>
+</div>
+
+<div id="stage">
+
+  <!-- 1 · TITLE -->
+  <section class="scene" data-dur="3800" data-sub="The Chunking Project Theory.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-title center fade" data-delay="150" x="500" y="250">The Chunking</text>
+        <text class="t-title center tx-coral fade" data-delay="450" x="500" y="340">Project Theory</text>
+        <path class="ink coral draw" data-delay="900" data-dur="900"
+              d="M250 372 Q500 400 760 366 Q680 388 420 384 Q320 384 250 372"/>
+        <g>
+          <rect class="pop" data-delay="1300" x="360" y="440" width="52" height="42" rx="6" fill="#fff" stroke="#2d2a26" stroke-width="4"/>
+          <rect class="pop" data-delay="1450" x="424" y="440" width="52" height="42" rx="6" fill="#fff" stroke="#2d2a26" stroke-width="4"/>
+          <rect class="pop" data-delay="1600" x="488" y="440" width="52" height="42" rx="6" fill="#fdeee9" stroke="#e8503a" stroke-width="4"/>
+          <rect class="pop" data-delay="1750" x="552" y="440" width="52" height="42" rx="6" fill="#fff" stroke="#2d2a26" stroke-width="4"/>
+          <text class="t-s center tx-muted fade" data-delay="2000" x="500" y="522">chunks</text>
+        </g>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 2 · 10x OBSESSION (AI robot pushes the project) -->
+  <section class="scene" data-dur="5600" data-sub="Every project-implementation firm is obsessed with going ten times faster with AI.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <!-- 10x badge -->
+        <text class="t-big center tx-coral fade" data-delay="150" x="500" y="150">10×</text>
+
+        <!-- ===== AI robot (left), leaning in to push ===== -->
+        <!-- antenna -->
+        <path class="ink blue draw" data-delay="450" data-dur="300" d="M150 250 L150 210"/>
+        <circle class="pop" data-delay="750" cx="150" cy="204" r="9" fill="#2f6fed" stroke="#2f6fed"/>
+        <!-- head -->
+        <path class="ink blue draw" data-delay="500" data-dur="600" d="M96 250 L204 250 L204 330 L96 330 Z"/>
+        <!-- eyes -->
+        <circle class="pop" data-delay="1000" cx="132" cy="288" r="11" fill="#2f6fed"/>
+        <circle class="pop" data-delay="1120" cx="172" cy="288" r="11" fill="#2f6fed"/>
+        <!-- smile -->
+        <path class="ink blue draw thin" data-delay="1250" data-dur="300" d="M128 308 Q150 322 176 308"/>
+        <!-- body -->
+        <path class="ink blue draw" data-delay="900" data-dur="700" d="M104 340 L196 340 L206 452 L94 452 Z"/>
+        <!-- panel dots -->
+        <circle class="pop" data-delay="1400" cx="150" cy="376" r="6" fill="#2f6fed"/>
+        <path class="ink blue draw thin" data-delay="1500" data-dur="300" d="M120 404 L180 404"/>
+        <path class="ink blue draw thin" data-delay="1600" data-dur="300" d="M120 424 L180 424"/>
+        <!-- legs -->
+        <path class="ink blue draw" data-delay="1500" data-dur="300" d="M124 452 L120 510"/>
+        <path class="ink blue draw" data-delay="1600" data-dur="300" d="M176 452 L182 510"/>
+        <!-- two bent arms pushing the crate -->
+        <path class="ink blue draw fat" data-delay="1700" data-dur="500" d="M196 360 L270 356 L344 372"/>
+        <path class="ink blue draw fat" data-delay="1850" data-dur="500" d="M196 420 L270 424 L344 412"/>
+        <!-- hands flat against the crate -->
+        <path class="ink blue draw" data-delay="2200" data-dur="250" d="M344 360 L344 386"/>
+        <path class="ink blue draw" data-delay="2300" data-dur="250" d="M344 400 L344 426"/>
+
+        <!-- ===== project crate being shoved right, fast ===== -->
+        <path class="ink draw" data-delay="2300" data-dur="700" d="M356 336 L520 336 L520 452 L356 452 Z"/>
+        <text class="t-s center fade" data-delay="2800" x="438" y="400">PROJECT</text>
+        <!-- speed streaks trailing the crate -->
+        <path class="ink coral draw thin" data-delay="3000" data-dur="250" d="M300 356 L360 356"/>
+        <path class="ink coral draw thin" data-delay="3100" data-dur="250" d="M300 396 L360 396"/>
+        <path class="ink coral draw thin" data-delay="3200" data-dur="250" d="M300 436 L360 436"/>
+
+        <!-- ===== motion arrow + faster ===== -->
+        <path class="ink coral draw fat" data-delay="3400" data-dur="700" d="M560 396 L780 396"/>
+        <path class="ink coral draw" data-delay="4000" data-dur="300" d="M780 396 L742 372"/>
+        <path class="ink coral draw" data-delay="4100" data-dur="300" d="M780 396 L742 420"/>
+        <text class="t-m center tx-coral fade" data-delay="4300" x="700" y="470">faster!</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 3 · 1 YEAR -> 1 MONTH -->
+  <section class="scene" data-dur="5200" data-sub="The dream: squeeze a 1-year project into a single month.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <path class="ink draw" data-delay="150" data-dur="900" d="M120 250 L560 250 L560 380 L120 380 Z"/>
+        <text class="t-h center fade" data-delay="700" x="340" y="330">1 YEAR</text>
+        <path class="ink coral draw fat" data-delay="1200" data-dur="600" d="M600 315 L720 315"/>
+        <path class="ink coral draw" data-delay="1700" data-dur="300" d="M720 315 L688 296"/>
+        <path class="ink coral draw" data-delay="1800" data-dur="300" d="M720 315 L688 334"/>
+        <path class="ink green draw" data-delay="2000" data-dur="700" d="M760 250 L900 250 L900 380 L760 380 Z"/>
+        <text class="t-m center tx-green fade" data-delay="2500" x="830" y="322">1 MONTH</text>
+        <!-- compression squeeze arrows -->
+        <path class="ink muted draw thin" data-delay="2900" data-dur="300" d="M740 315 L768 315"/>
+        <path class="ink muted draw thin" data-delay="3000" data-dur="300" d="M920 315 L892 315"/>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 4 · NOT POSSIBLE -->
+  <section class="scene" data-dur="4600" data-sub="The theory argues that, in the general case, this is not possible.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-big center tx-muted fade" data-delay="150" x="500" y="360" opacity=".5">10×</text>
+        <circle class="ink coral fill-none draw" data-delay="500" data-dur="1200" cx="500" cy="310" r="180"/>
+        <path class="ink coral draw fat" data-delay="1500" data-dur="700" d="M373 183 L627 437"/>
+        <text class="t-m center tx-coral fade" data-delay="2300" x="500" y="560">not possible</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 5 · CRITICAL PATH ≠ IMPLEMENTER SPEED -->
+  <section class="scene" data-dur="5200" data-sub="The critical path is not set by the implementer's speed —">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <!-- laptop -->
+        <path class="ink blue draw" data-delay="150" data-dur="900" d="M370 210 L630 210 L630 360 L370 360 Z"/>
+        <path class="ink blue draw" data-delay="900" data-dur="600" d="M330 400 L670 400 L640 360 L360 360 Z"/>
+        <text class="t-m center tx-blue fade" data-delay="1400" x="500" y="300">&lt;/&gt;</text>
+        <!-- speed lines -->
+        <path class="ink muted draw thin" data-delay="1700" data-dur="300" d="M300 240 L230 240"/>
+        <path class="ink muted draw thin" data-delay="1800" data-dur="300" d="M300 290 L210 290"/>
+        <path class="ink muted draw thin" data-delay="1900" data-dur="300" d="M300 340 L230 340"/>
+        <g>
+          <rect class="pop" data-delay="2200" x="700" y="270" width="196" height="60" rx="14" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
+          <text class="t-m center tx-blue fade" data-delay="2350" x="798" y="308">10× faster</text>
+        </g>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 6 · CLIENT SETS THE PACE -->
+  <section class="scene" data-dur="5400" data-sub="— it is set by the dependencies on the client.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <!-- stick figure client -->
+        <circle class="ink draw fill-none" data-delay="150" data-dur="500" cx="360" cy="180" r="42"/>
+        <path class="ink draw" data-delay="600" data-dur="500" d="M360 222 L360 380"/>
+        <path class="ink draw" data-delay="900" data-dur="500" d="M300 290 L360 260 L420 290"/>
+        <path class="ink draw" data-delay="1100" data-dur="500" d="M360 380 L310 470"/>
+        <path class="ink draw" data-delay="1250" data-dur="500" d="M360 380 L410 470"/>
+        <text class="t-s center fade" data-delay="1500" x="360" y="520">the client</text>
+        <!-- clock -->
+        <circle class="ink amber draw fill-none" data-delay="1800" data-dur="800" cx="680" cy="290" r="110"/>
+        <path class="ink amber draw" data-delay="2500" data-dur="400" d="M680 290 L680 220"/>
+        <path class="ink amber draw" data-delay="2800" data-dur="400" d="M680 290 L740 320"/>
+        <text class="t-m center tx-amber fade" data-delay="3100" x="680" y="450">sets the pace</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 7 · CHUNKS ON A TIMELINE (client lane on top, integrator lane below) -->
+  <section class="scene" data-dur="7200" data-sub="A project splits into client dependencies. Between them live what the theory calls chunks.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <!-- ===== CLIENT lane (top) — the client's work across the project ===== -->
+        <text class="t-s tx-coral fade" data-delay="120" x="90" y="130">CLIENT</text>
+        <path class="ink coral draw fat" data-delay="300" data-dur="1100" d="M90 170 L910 170"/>
+
+        <!-- dependency drops from client to integrator — varied thickness = varied weight -->
+        <path class="ink coral draw fat"  data-delay="1300" data-dur="300" d="M120 178 L120 430"/>
+        <path class="ink coral draw thin" data-delay="1450" data-dur="300" d="M300 178 L300 430"/>
+        <path class="ink coral draw fat"  data-delay="1600" data-dur="300" d="M520 178 L520 430"/>
+        <path class="ink coral draw thin" data-delay="1750" data-dur="300" d="M720 178 L720 430"/>
+        <path class="ink coral draw fat"  data-delay="1900" data-dur="300" d="M900 178 L900 430"/>
+
+        <!-- little contact dots where a dependency lands on the integrator -->
+        <circle class="pop" data-delay="1600" cx="120" cy="440" r="8" fill="#e8503a"/>
+        <circle class="pop" data-delay="1750" cx="300" cy="440" r="8" fill="#e8503a"/>
+        <circle class="pop" data-delay="1900" cx="520" cy="440" r="8" fill="#e8503a"/>
+        <circle class="pop" data-delay="2050" cx="720" cy="440" r="8" fill="#e8503a"/>
+        <circle class="pop" data-delay="2200" cx="900" cy="440" r="8" fill="#e8503a"/>
+
+        <!-- ===== INTEGRATOR lane (bottom) with the chunks between drops ===== -->
+        <path class="ink draw fat" data-delay="2100" data-dur="1000" d="M90 440 L910 440"/>
+        <text class="t-s tx-muted fade" data-delay="2400" x="90" y="500">INTEGRATOR</text>
+
+        <g><rect class="pop" data-delay="2600" x="132" y="410" width="156" height="56" rx="8" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
+           <text class="t-s center tx-blue fade" data-delay="2750" x="210" y="446">chunk</text></g>
+        <g><rect class="pop" data-delay="2850" x="312" y="410" width="196" height="56" rx="8" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="3000" x="410" y="446">chunk</text></g>
+        <g><rect class="pop" data-delay="3100" x="532" y="410" width="176" height="56" rx="8" fill="#fdf3d9" stroke="#f2b01e" stroke-width="4"/>
+           <text class="t-s center tx-amber fade" data-delay="3250" x="620" y="446">chunk</text></g>
+        <g><rect class="pop" data-delay="3350" x="732" y="410" width="156" height="56" rx="8" fill="#fdeee9" stroke="#e8503a" stroke-width="4"/>
+           <text class="t-s center tx-coral fade" data-delay="3500" x="810" y="446">chunk</text></g>
+
+        <text class="t-s center tx-coral fade" data-delay="3800" x="500" y="300">↑ client dependencies set the boundaries</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 8 · CHUNK TYPES -->
+  <section class="scene" data-dur="5800" data-sub="Each chunk has a type — by phase and by project — and needs its own AI tools.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <g><rect class="pop" data-delay="150" x="410" y="120" width="180" height="70" rx="12" fill="#fdeee9" stroke="#e8503a" stroke-width="5"/>
+           <text class="t-m center tx-coral fade" data-delay="300" x="500" y="164">a chunk</text></g>
+        <path class="ink draw" data-delay="700" data-dur="500" d="M470 190 L250 320"/>
+        <path class="ink draw" data-delay="900" data-dur="500" d="M500 190 L500 320"/>
+        <path class="ink draw" data-delay="1100" data-dur="500" d="M530 190 L750 320"/>
+        <g><rect class="pop" data-delay="1500" x="130" y="330" width="220" height="66" rx="12" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
+           <text class="t-s center tx-blue fade" data-delay="1650" x="240" y="372">PHASE</text></g>
+        <g><rect class="pop" data-delay="1750" x="390" y="330" width="220" height="66" rx="12" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="1900" x="500" y="372">PROJECT TYPE</text></g>
+        <g><rect class="pop" data-delay="2000" x="650" y="330" width="220" height="66" rx="12" fill="#fdf3d9" stroke="#f2b01e" stroke-width="4"/>
+           <text class="t-s center tx-amber fade" data-delay="2150" x="760" y="372">AI TOOLS</text></g>
+        <text class="t-s center tx-muted fade" data-delay="2600" x="500" y="480">type = phase × project → tools</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 8b · EXAMPLES INTRO -->
+  <section class="scene" data-dur="5600" data-sub="Here are two examples of AI tools used across different project chunks.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center fade" data-delay="150" x="500" y="130">two examples</text>
+        <text class="t-s center tx-muted fade" data-delay="500" x="500" y="180">AI tools by chunk type</text>
+
+        <!-- discovery card -->
+        <g><rect class="pop" data-delay="1000" x="120" y="250" width="320" height="180" rx="18" fill="#eaf0fe" stroke="#2f6fed" stroke-width="5"/>
+           <text class="t-h center tx-blue fade" data-delay="1300" x="280" y="330">DISCOVERY</text>
+           <text class="t-s center tx-muted fade" data-delay="1600" x="280" y="380">workshops &amp; use cases</text></g>
+
+        <!-- implementation card -->
+        <g><rect class="pop" data-delay="2100" x="560" y="250" width="320" height="180" rx="18" fill="#e9f6ee" stroke="#3aa856" stroke-width="5"/>
+           <text class="t-h center tx-green fade" data-delay="2400" x="720" y="330">IMPLEMENTATION</text>
+           <text class="t-s center tx-muted fade" data-delay="2700" x="720" y="380">build &amp; configure</text></g>
+
+        <text class="t-s center tx-muted fade" data-delay="3400" x="500" y="500">different chunk → different tools</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 9 · DISCOVERY (client explaining + integrator taking notes) -->
+  <section class="scene" data-dur="7200" data-sub="Discovery: the client explains while the integrator captures — AI transcribes, builds use cases and documents.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center tx-blue fade" data-delay="150" x="500" y="95">DISCOVERY</text>
+
+        <!-- ===== CLIENT (left) — talking, one hand raised explaining ===== -->
+        <circle class="ink draw fill-none" data-delay="400" data-dur="450" cx="220" cy="200" r="42"/>
+        <circle class="pop" data-delay="850" cx="206" cy="196" r="4" fill="#2d2a26"/>
+        <circle class="pop" data-delay="900" cx="234" cy="196" r="4" fill="#2d2a26"/>
+        <!-- talking mouth -->
+        <path class="ink draw thin" data-delay="950" data-dur="250" d="M204 216 Q220 228 236 216"/>
+        <path class="ink draw" data-delay="850" data-dur="350" d="M220 242 L220 380"/>
+        <!-- raised explaining arm -->
+        <path class="ink draw" data-delay="1100" data-dur="350" d="M220 285 L172 240 L182 200"/>
+        <!-- resting arm -->
+        <path class="ink draw" data-delay="1250" data-dur="300" d="M220 285 L268 320"/>
+        <path class="ink draw" data-delay="1400" data-dur="300" d="M220 380 L190 470"/>
+        <path class="ink draw" data-delay="1500" data-dur="300" d="M220 380 L250 470"/>
+        <text class="t-s center tx-muted fade" data-delay="1700" x="220" y="510">client explains</text>
+        <!-- speech bubble -->
+        <path class="ink blue draw fill-none thin" data-delay="1000" data-dur="500" d="M300 150 q90 -6 90 40 q0 40 -70 40 l-24 20 l4 -22 q-24 -14 -24 -38 q0 -40 24 -40"/>
+        <path class="ink blue draw thin" data-delay="1500" data-dur="200" d="M330 174 L378 174 M330 194 L366 194"/>
+
+        <!-- ===== INTEGRATOR (right) — taking notes on a pad ===== -->
+        <circle class="ink draw fill-none green" data-delay="600" data-dur="450" cx="720" cy="200" r="42"/>
+        <circle class="pop" data-delay="1050" cx="706" cy="198" r="4" fill="#3aa856"/>
+        <circle class="pop" data-delay="1100" cx="734" cy="198" r="4" fill="#3aa856"/>
+        <path class="ink green draw thin" data-delay="1150" data-dur="200" d="M706 218 Q720 226 734 218"/>
+        <path class="ink green draw" data-delay="1050" data-dur="350" d="M720 242 L720 380"/>
+        <!-- arm holding notepad + arm writing -->
+        <path class="ink green draw" data-delay="1300" data-dur="300" d="M720 290 L672 330"/>
+        <path class="ink green draw" data-delay="1450" data-dur="300" d="M720 290 L770 330"/>
+        <path class="ink green draw" data-delay="1600" data-dur="300" d="M720 380 L690 470"/>
+        <path class="ink green draw" data-delay="1700" data-dur="300" d="M720 380 L750 470"/>
+        <!-- notepad -->
+        <rect class="pop" data-delay="1900" x="646" y="322" width="86" height="70" rx="6" fill="#fff" stroke="#3aa856" stroke-width="4"/>
+        <path class="ink green draw thin" data-delay="2100" data-dur="200" d="M658 342 L720 342 M658 358 L720 358 M658 374 L700 374"/>
+        <text class="t-s center tx-muted fade" data-delay="2000" x="720" y="510">integrator takes notes</text>
+
+        <!-- ===== AI tool chips (concrete) ===== -->
+        <g><rect class="pop" data-delay="2600" x="120" y="548" width="230" height="54" rx="16" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
+           <text class="t-s center tx-blue fade" data-delay="2750" x="235" y="582">Elements.cloud</text></g>
+        <g><rect class="pop" data-delay="2850" x="386" y="548" width="230" height="54" rx="16" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
+           <text class="t-s center tx-blue fade" data-delay="3000" x="501" y="582">NotebookLM</text></g>
+        <g><rect class="pop" data-delay="3100" x="652" y="548" width="230" height="54" rx="16" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
+           <text class="t-s center tx-blue fade" data-delay="3250" x="767" y="582">Claude Code</text></g>
+        <text class="t-s center tx-muted fade" data-delay="3600" x="500" y="150">transcribe · use cases · document</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 10 · IMPLEMENTATION -->
+  <section class="scene" data-dur="6000" data-sub="Implementation: tools like Cursor, Claude Code and Codex build and configure.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center tx-green fade" data-delay="150" x="500" y="120">IMPLEMENTATION</text>
+        <path class="ink green draw fat" data-delay="450" data-dur="700" d="M440 200 L380 270 L440 340"/>
+        <path class="ink green draw fat" data-delay="1000" data-dur="700" d="M560 200 L620 270 L560 340"/>
+        <g><rect class="pop" data-delay="1600" x="130" y="400" width="220" height="60" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="1750" x="240" y="438">Cursor</text></g>
+        <g><rect class="pop" data-delay="1900" x="390" y="400" width="220" height="60" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="2050" x="500" y="438">Claude Code</text></g>
+        <g><rect class="pop" data-delay="2200" x="650" y="400" width="220" height="60" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="2350" x="760" y="438">Codex</text></g>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 11 · SPRINT SHRINKS (implementer side) -->
+  <section class="scene" data-dur="5400" data-sub="A sprint that took 3 weeks now takes 3 days — on the implementer's side.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-s center tx-muted fade" data-delay="100" x="500" y="130">implementer</text>
+        <path class="ink blue draw" data-delay="300" data-dur="900" d="M120 220 L620 220 L620 300 L120 300 Z"/>
+        <text class="t-m center tx-blue fade" data-delay="900" x="370" y="272">3 WEEKS</text>
+        <path class="ink coral draw fat" data-delay="1500" data-dur="600" d="M400 360 L400 420"/>
+        <path class="ink coral draw" data-delay="2000" data-dur="300" d="M400 420 L378 388"/>
+        <path class="ink coral draw" data-delay="2100" data-dur="300" d="M400 420 L422 388"/>
+        <path class="ink green draw" data-delay="2400" data-dur="700" d="M300 460 L500 460 L500 540 L300 540 Z"/>
+        <text class="t-m center tx-green fade" data-delay="3000" x="400" y="512">3 DAYS</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 12 · CLIENT CAN'T MATCH (panicking client) -->
+  <section class="scene" data-dur="6400" data-sub="But the client may not give feedback every 3 days instead of every 3 weeks.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-s center tx-muted fade" data-delay="100" x="330" y="90">the client</text>
+
+        <!-- head -->
+        <circle class="ink draw fill-none" data-delay="300" data-dur="500" cx="330" cy="210" r="52"/>
+        <!-- worried eyebrows -->
+        <path class="ink draw thin" data-delay="800" data-dur="250" d="M300 188 L322 198"/>
+        <path class="ink draw thin" data-delay="900" data-dur="250" d="M360 188 L338 198"/>
+        <!-- wide panic eyes -->
+        <circle class="ink draw fill-none thin" data-delay="1000" data-dur="250" cx="312" cy="212" r="9"/>
+        <circle class="ink draw fill-none thin" data-delay="1100" data-dur="250" cx="348" cy="212" r="9"/>
+        <circle class="pop" data-delay="1250" cx="312" cy="213" r="3.5" fill="#2d2a26"/>
+        <circle class="pop" data-delay="1300" cx="348" cy="213" r="3.5" fill="#2d2a26"/>
+        <!-- open worried mouth -->
+        <ellipse class="ink draw fill-none thin" data-delay="1350" data-dur="300" cx="330" cy="240" rx="13" ry="10"/>
+
+        <!-- sweat drops flying off -->
+        <path class="ink blue draw thin" data-delay="1500" data-dur="250" d="M392 176 q10 12 0 22 q-10 -10 0 -22"/>
+        <path class="ink blue draw thin" data-delay="1650" data-dur="250" d="M406 210 q9 11 0 20 q-9 -9 0 -20"/>
+
+        <!-- stress marks around head -->
+        <path class="ink coral draw thin" data-delay="1750" data-dur="200" d="M250 150 L236 132"/>
+        <path class="ink coral draw thin" data-delay="1850" data-dur="200" d="M410 150 L424 132"/>
+        <path class="ink coral draw thin" data-delay="1950" data-dur="200" d="M262 178 L244 172"/>
+
+        <!-- body -->
+        <path class="ink draw" data-delay="900" data-dur="400" d="M330 262 L330 410"/>
+        <!-- both arms raised, hands clutching the head (panic) -->
+        <path class="ink draw fat" data-delay="1300" data-dur="450" d="M330 300 L288 236 L292 190"/>
+        <path class="ink draw fat" data-delay="1450" data-dur="450" d="M330 300 L372 236 L368 190"/>
+        <!-- little hand fingers at head -->
+        <path class="ink draw thin" data-delay="1900" data-dur="200" d="M284 190 L280 176 M292 188 L292 172 M300 190 L304 176"/>
+        <path class="ink draw thin" data-delay="2000" data-dur="200" d="M376 190 L380 176 M368 188 L368 172 M360 190 L356 176"/>
+        <!-- legs -->
+        <path class="ink draw" data-delay="1500" data-dur="400" d="M330 410 L296 500"/>
+        <path class="ink draw" data-delay="1650" data-dur="400" d="M330 410 L364 500"/>
+
+        <!-- still-wide bar: client's pace hasn't changed -->
+        <path class="ink coral draw" data-delay="2400" data-dur="900" d="M540 280 L900 280 L900 360 L540 360 Z"/>
+        <text class="t-m center tx-coral fade" data-delay="3100" x="720" y="332">still 3 weeks</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 13 · COMPRESSION CAPPED -->
+  <section class="scene" data-dur="6000" data-sub="So the project won't compress 10 times. Only as far as the client allows.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-s tx-blue fade" data-delay="100" x="120" y="200">our work</text>
+        <path class="ink blue draw" data-delay="300" data-dur="500" d="M120 220 L300 220 L300 270 L120 270 Z"/>
+        <text class="t-s tx-muted fade" data-delay="700" x="120" y="360">the project</text>
+        <path class="ink coral draw" data-delay="900" data-dur="1000" d="M120 380 L700 380 L700 440 L120 440 Z"/>
+        <!-- client wall -->
+        <path class="ink draw fat muted" data-delay="2000" data-dur="700" d="M720 150 L720 500"/>
+        <text class="t-s center tx-muted fade" data-delay="2600" x="800" y="300">client</text>
+        <text class="t-s center tx-muted fade" data-delay="2700" x="800" y="335">limit</text>
+        <path class="ink coral draw" data-delay="3100" data-dur="400" d="M700 410 L718 410"/>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 14 · SHRINK THE TEAM -->
+  <section class="scene" data-dur="6000" data-sub="Either you shrink the team and keep the chunk size —">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <!-- many -->
+        <g class="pop" data-delay="150"><circle cx="130" cy="240" r="26" fill="none" stroke="#2d2a26" stroke-width="5"/><path d="M130 266 L130 340 M100 300 L160 300 M130 340 L108 400 M130 340 L152 400" fill="none" stroke="#2d2a26" stroke-width="5" stroke-linecap="round"/></g>
+        <g class="pop" data-delay="300"><circle cx="210" cy="240" r="26" fill="none" stroke="#2d2a26" stroke-width="5"/><path d="M210 266 L210 340 M180 300 L240 300 M210 340 L188 400 M210 340 L232 400" fill="none" stroke="#2d2a26" stroke-width="5" stroke-linecap="round"/></g>
+        <g class="pop" data-delay="450"><circle cx="290" cy="240" r="26" fill="none" stroke="#2d2a26" stroke-width="5"/><path d="M290 266 L290 340 M260 300 L320 300 M290 340 L268 400 M290 340 L312 400" fill="none" stroke="#2d2a26" stroke-width="5" stroke-linecap="round"/></g>
+        <g class="pop" data-delay="600"><circle cx="370" cy="240" r="26" fill="none" stroke="#2d2a26" stroke-width="5"/><path d="M370 266 L370 340 M340 300 L400 300 M370 340 L348 400 M370 340 L392 400" fill="none" stroke="#2d2a26" stroke-width="5" stroke-linecap="round"/></g>
+        <path class="ink coral draw fat" data-delay="1000" data-dur="600" d="M470 320 L600 320"/>
+        <path class="ink coral draw" data-delay="1500" data-dur="300" d="M600 320 L568 300"/>
+        <path class="ink coral draw" data-delay="1600" data-dur="300" d="M600 320 L568 340"/>
+        <!-- few -->
+        <g class="pop" data-delay="2000"><circle cx="720" cy="240" r="26" fill="none" stroke="#3aa856" stroke-width="5"/><path d="M720 266 L720 340 M690 300 L750 300 M720 340 L698 400 M720 340 L742 400" fill="none" stroke="#3aa856" stroke-width="5" stroke-linecap="round"/></g>
+        <g class="pop" data-delay="2300"><circle cx="810" cy="240" r="26" fill="none" stroke="#3aa856" stroke-width="5"/><path d="M810 266 L810 340 M780 300 L840 300 M810 340 L788 400 M810 340 L832 400" fill="none" stroke="#3aa856" stroke-width="5" stroke-linecap="round"/></g>
+        <text class="t-s center tx-green fade" data-delay="2700" x="765" y="470">smaller team, same chunks</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 15 · OR IMPOSSIBLE -->
+  <section class="scene" data-dur="5000" data-sub="— or the compression is simply impossible.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <path class="ink draw" data-delay="150" data-dur="700" d="M380 250 L620 250 L620 380 L380 380 Z"/>
+        <text class="t-m center fade" data-delay="600" x="500" y="322">1 MONTH</text>
+        <path class="ink coral draw fat" data-delay="1200" data-dur="600" d="M360 220 L640 410"/>
+        <path class="ink coral draw fat" data-delay="1700" data-dur="600" d="M640 220 L360 410"/>
+        <text class="t-m center tx-coral fade" data-delay="2400" x="500" y="500">impossible</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 16 · CLOSING -->
+  <section class="scene" data-dur="7000" data-sub="AI doesn't remove the client's critical path — it just changes who the bottleneck is.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-m center fade" data-delay="200" x="500" y="200">AI doesn't remove the</text>
+        <text class="t-m center tx-coral fade" data-delay="600" x="500" y="252">client's critical path.</text>
+        <text class="t-m center fade" data-delay="1200" x="500" y="332">It changes who the</text>
+        <text class="t-m center tx-blue fade" data-delay="1600" x="500" y="384">bottleneck is.</text>
+        <path class="ink amber draw" data-delay="2200" data-dur="900"
+              d="M250 430 Q500 458 760 424 Q680 446 420 442 Q320 442 250 430"/>
+        <text class="t-s center tx-muted fade" data-delay="3000" x="500" y="530">— The Chunking Project Theory</text>
+      </g>
+    </svg>
+  </section>
+
+</div>
+
+<div id="caption"></div>
+<div id="bar"><div id="fill"></div></div>
+<div id="controls">
+  <button id="prev" title="Previous (←)">◀</button>
+  <button id="play" title="Play / Pause (space)">❚❚</button>
+  <button id="next" title="Next (→)">▶</button>
+  <button id="replay" title="Replay (R)">↻ replay</button>
+  <button id="mute" title="Mute / Unmute (M)">🔊</button>
+  <span id="counter">1 / 17</span>
+  <span class="hint">space=play/pause · ←/→=scene · M=mute · R=replay</span>
+</div>
+
+<script>
+(function(){
+  const scenes   = Array.from(document.querySelectorAll('.scene'));
+  const caption  = document.getElementById('caption');
+  const fill     = document.getElementById('fill');
+  const counter  = document.getElementById('counter');
+  const playBtn  = document.getElementById('play');
+  const muteBtn  = document.getElementById('mute');
+  const durs     = scenes.map(s => parseInt(s.dataset.dur,10) || 5000);
+  const total    = durs.reduce((a,b)=>a+b,0);
+  const cumBefore= durs.map((_,i)=> durs.slice(0,i).reduce((a,b)=>a+b,0));
+
+  let idx = 0;
+  let playing = true;
+  let sceneT0 = 0;        // performance.now() when current scene (re)started counting
+  let accrued = 0;        // ms already counted for current scene (across pauses)
+
+  /* ---- narration (Web Speech API, self-contained, no external audio) ---- */
+  const synth   = window.speechSynthesis;
+  const hasTTS  = !!synth;
+  let muted     = false;
+  let started   = false;   // browsers block audio until first user gesture
+  let speechDone= true;    // gates scene advance when audio is on
+  let voice     = null;
+  const LEAD_MS = 450;     // let the drawing begin before the voice starts
+
+  function pickVoice(){
+    if (!hasTTS) return;
+    const vs = synth.getVoices();
+    voice = vs.find(v => /en[-_]GB/i.test(v.lang) && /female|Google|Serena|Kate|Libby|Sonia/i.test(v.name))
+         || vs.find(v => /^en[-_]US/i.test(v.lang) && /Google|Samantha|Jenny|Aria/i.test(v.name))
+         || vs.find(v => /^en/i.test(v.lang))
+         || vs[0] || null;
+  }
+  if (hasTTS){
+    pickVoice();
+    synth.onvoiceschanged = pickVoice;
+  }
+
+  let leadTimer = null;
+  function speak(text){
+    if (!hasTTS || muted || !started){ speechDone = true; return; }
+    synth.cancel();
+    clearTimeout(leadTimer);
+    speechDone = false;
+    leadTimer = setTimeout(()=>{
+      if (muted || !playing){ speechDone = true; return; }
+      const u = new SpeechSynthesisUtterance(text);
+      if (voice) u.voice = voice;
+      u.rate = 0.98; u.pitch = 1.0; u.lang = voice ? voice.lang : 'en-US';
+      u.onend = ()=>{ speechDone = true; };
+      u.onerror = ()=>{ speechDone = true; };
+      synth.speak(u);
+    }, LEAD_MS);
+  }
+
+  function playAnims(scene){
+    // draw-on paths
+    scene.querySelectorAll('.draw').forEach(el=>{
+      let len = 300;
+      try { len = el.getTotalLength() || 300; } catch(e){}
+      const delay = parseFloat(el.dataset.delay || 0);
+      const dur   = parseFloat(el.dataset.dur   || 900);
+      el.style.transition = 'none';
+      el.style.strokeDasharray  = len;
+      el.style.strokeDashoffset = len;
+      el.getBoundingClientRect(); // reflow
+      el.style.transition = `stroke-dashoffset ${dur}ms cubic-bezier(.65,0,.35,1) ${delay}ms`;
+      el.style.strokeDashoffset = '0';
+    });
+    // pop / fade elements — restart CSS animation
+    scene.querySelectorAll('.pop, .fade').forEach(el=>{
+      el.classList.remove('go');
+      const delay = parseFloat(el.dataset.delay || 0);
+      el.style.animationDelay = delay + 'ms';
+      void el.offsetWidth; // reflow
+      el.classList.add('go');
+    });
+  }
+
+  function activate(i){
+    idx = (i + scenes.length) % scenes.length;
+    scenes.forEach((s,k)=> s.classList.toggle('active', k===idx));
+    const s = scenes[idx];
+    playAnims(s);
+    // caption
+    caption.textContent = s.dataset.sub || '';
+    caption.classList.remove('show');
+    void caption.offsetWidth;
+    caption.classList.add('show');
+    counter.textContent = (idx+1) + ' / ' + scenes.length;
+    accrued = 0;
+    sceneT0 = performance.now();
+    speak(s.dataset.sub || '');
+  }
+
+  function next(){ activate(idx+1); }
+  function prev(){ activate(idx-1); }
+
+  function setPlaying(p){
+    playing = p;
+    playBtn.textContent = p ? '❚❚' : '▶';
+    if (p){ sceneT0 = performance.now(); }
+    else if (hasTTS){ synth.cancel(); clearTimeout(leadTimer); }
+  }
+
+  function loop(now){
+    if (playing){
+      const elapsed = accrued + (now - sceneT0);
+      const shown = Math.min(elapsed, durs[idx]);
+      fill.style.width = ((cumBefore[idx] + shown) / total * 100) + '%';
+      // advance only when the timed duration passed AND the narration finished
+      const audioGate = (muted || !started) ? true : speechDone;
+      if (elapsed >= durs[idx] && audioGate){
+        if (idx === scenes.length - 1){
+          setPlaying(false);       // stop at the end
+          fill.style.width = '100%';
+        } else {
+          next();
+        }
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+
+  // controls
+  playBtn.addEventListener('click', ()=>{
+    if (playing){
+      accrued += performance.now() - sceneT0; // bank progress
+      setPlaying(false);
+    } else {
+      if (idx === scenes.length-1 && accrued >= durs[idx]) { activate(0); }
+      setPlaying(true);
+    }
+  });
+  document.getElementById('next').addEventListener('click', ()=>{ next(); setPlaying(true); });
+  document.getElementById('prev').addEventListener('click', ()=>{ prev(); setPlaying(true); });
+  document.getElementById('replay').addEventListener('click', ()=>{ activate(0); setPlaying(true); });
+
+  function setMuted(m){
+    muted = m;
+    muteBtn.textContent = m ? '🔇' : '🔊';
+    if (m && hasTTS){ synth.cancel(); clearTimeout(leadTimer); speechDone = true; }
+    else if (!m && playing){ speak(scenes[idx].dataset.sub || ''); } // start narrating current scene
+  }
+  muteBtn.addEventListener('click', ()=> setMuted(!muted));
+
+  // Start gate: browsers block speech until a user gesture.
+  // Hold on scene 1 until the user clicks, then begin with narration.
+  const gate = document.getElementById('startgate');
+  function beginShow(){
+    if (started) return;
+    started = true;
+    gate.classList.add('hide');
+    setTimeout(()=>gate.remove(), 500);
+    activate(0);            // restart scene 1 anims cleanly
+    setPlaying(true);
+    if (hasTTS && !muted) speak(scenes[0].dataset.sub || '');
+  }
+  gate.addEventListener('click', beginShow);
+
+  document.addEventListener('keydown', e=>{
+    if (!started){ beginShow(); return; }   // any key also starts the show
+    if (e.code === 'Space'){ e.preventDefault(); playBtn.click(); }
+    else if (e.code === 'ArrowRight'){ next(); setPlaying(true); }
+    else if (e.code === 'ArrowLeft'){ prev(); setPlaying(true); }
+    else if (e.key === 'r' || e.key === 'R'){ activate(0); setPlaying(true); }
+    else if (e.key === 'm' || e.key === 'M'){ setMuted(!muted); }
+  });
+
+  // prime scene 1 visuals behind the gate, but hold playback until user clicks
+  activate(0);
+  setPlaying(false);
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
