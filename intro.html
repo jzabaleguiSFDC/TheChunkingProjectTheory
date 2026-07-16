@@ -623,19 +623,33 @@
   }
 
   let leadTimer = null;
+  let speakGen  = 0;       // generation guard: invalidates stale utterances on scene change
+  // Chrome's speech engine truncates long single utterances. Split into short
+  // clauses and chain them — each clause resets the engine's watchdog.
+  function splitClauses(text){
+    return text.match(/[^.!?;:]+[.!?;:]*/g) || [text];
+  }
   function speak(text){
     if (!hasTTS || muted || !started){ speechDone = true; return; }
     synth.cancel();
     clearTimeout(leadTimer);
     speechDone = false;
+    const gen = ++speakGen;                 // this call owns generation `gen`
+    const clauses = splitClauses(text).map(s => s.trim()).filter(Boolean);
     leadTimer = setTimeout(()=>{
-      if (muted || !playing){ speechDone = true; return; }
-      const u = new SpeechSynthesisUtterance(text);
-      if (voice) u.voice = voice;
-      u.rate = 0.98; u.pitch = 1.0; u.lang = voice ? voice.lang : 'en-US';
-      u.onend = ()=>{ speechDone = true; };
-      u.onerror = ()=>{ speechDone = true; };
-      synth.speak(u);
+      if (gen !== speakGen || muted || !playing){ if(gen===speakGen) speechDone = true; return; }
+      let i = 0;
+      const sayNext = ()=>{
+        if (gen !== speakGen) return;        // scene changed — abandon quietly
+        if (i >= clauses.length){ speechDone = true; return; }
+        const u = new SpeechSynthesisUtterance(clauses[i++]);
+        if (voice) u.voice = voice;
+        u.rate = 0.98; u.pitch = 1.0; u.lang = voice ? voice.lang : 'en-US';
+        u.onend   = ()=>{ if (gen === speakGen) sayNext(); };
+        u.onerror = ()=>{ if (gen === speakGen) sayNext(); }; // skip broken clause, keep going
+        synth.speak(u);
+      };
+      sayNext();
     }, LEAD_MS);
   }
 
@@ -686,7 +700,7 @@
     playing = p;
     playBtn.textContent = p ? '❚❚' : '▶';
     if (p){ sceneT0 = performance.now(); }
-    else if (hasTTS){ synth.cancel(); clearTimeout(leadTimer); }
+    else if (hasTTS){ speakGen++; synth.cancel(); clearTimeout(leadTimer); }
   }
 
   function loop(now){
@@ -725,7 +739,7 @@
   function setMuted(m){
     muted = m;
     muteBtn.textContent = m ? '🔇' : '🔊';
-    if (m && hasTTS){ synth.cancel(); clearTimeout(leadTimer); speechDone = true; }
+    if (m && hasTTS){ speakGen++; synth.cancel(); clearTimeout(leadTimer); speechDone = true; }
     else if (!m && playing){ speak(scenes[idx].dataset.sub || ''); } // start narrating current scene
   }
   muteBtn.addEventListener('click', ()=> setMuted(!muted));
