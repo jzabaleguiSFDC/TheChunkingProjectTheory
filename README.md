@@ -7,9 +7,11 @@ A theory on why AI does **not** let project-implementation firms compress a 1-ye
 ## Contents
 
 - **`teoria-del-chunking.md`** — the theory, written out (source of truth).
-- **`intro.html`** — self-contained hand-drawn "doodle" animation introducing the theory, with narration (Web Speech API).
-- **`chunk-definition.html`** — second animation: the anatomy of a chunk (entry gate → internal work → exit gate) and why AI shrinks the boxes but not the gates.
-- **`salesforce-fit.html`** — third animation: where the theory lands inside Salesforce — SEAP (shrinks many boxes), AI Delivery (the default: acceleration becomes more scope or quality, not less time), and Quantum Leap (the only lever that moves the gates — via contractual speed commitments on both sides).
+- **`html-animations/1-intro.html`** — self-contained hand-drawn "doodle" animation introducing the theory, with narration (Web Speech API).
+- **`html-animations/2-chunk-definition.html`** — second animation: the anatomy of a chunk (entry gate → internal work → exit gate) and why AI shrinks the boxes but not the gates.
+- **`html-animations/3-salesforce-fit.html`** — third animation: where the theory lands inside Salesforce — SEAP (shrinks many boxes), AI Delivery (the default: acceleration becomes more scope or quality, not less time), and Quantum Leap (the only lever that moves the gates — via contractual speed commitments on both sides).
+- **`html-animations/4-architects-mastering-ai.html`** — fourth animation: how Salesforce architects master AI — AI Fluency vs AI Assets, and the "AI Pills" that train fluency across the team.
+- **`management-deck.html`** — static, professional (non-doodle) slide deck in Salesforce corporate colors, summarizing the whole theory for management.
 
 Each `.html` opens in a browser — no build step, no server, no network.
 
@@ -18,9 +20,11 @@ Each `.html` opens in a browser — no build step, no server, no network.
 Open a file directly:
 
 ```bash
-open intro.html
-open chunk-definition.html
-open salesforce-fit.html
+open html-animations/1-intro.html
+open html-animations/2-chunk-definition.html
+open html-animations/3-salesforce-fit.html
+open html-animations/4-architects-mastering-ai.html
+open management-deck.html
 ```
 
 Click once to start (browsers require a gesture before playing audio).

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Chunking Project Theory — Architects Mastering AI</title>
+<style>
+  :root{
+    --paper:#fbf7ec;
+    --ink:#2d2a26;
+    --coral:#e8503a;
+    --blue:#2f6fed;
+    --amber:#f2b01e;
+    --green:#3aa856;
+    --muted:#b9b2a2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Comic Sans MS","Chalkboard SE","Comic Neue","Segoe Print","Bradley Hand",cursive,sans-serif;
+    overflow:hidden;
+    display:flex;flex-direction:column;
+    /* faint paper grid */
+    background-image:
+      linear-gradient(rgba(45,42,38,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45,42,38,.035) 1px, transparent 1px);
+    background-size:26px 26px;
+  }
+  #stage{
+    position:relative;flex:1;min-height:0;
+    display:flex;align-items:center;justify-content:center;
+    padding-bottom:120px; /* reserve room for the caption band */
+  }
+  .scene{
+    position:absolute;inset:0 0 120px 0; /* keep drawings above the caption */
+    display:none;
+    align-items:center;justify-content:center;
+  }
+  .scene.active{display:flex}
+  svg.board{width:min(94vw,1180px);height:auto;max-height:72vh;overflow:visible}
+
+  /* draw-on effect handled via JS (stroke-dashoffset) */
+  .ink{fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+  .thin{stroke-width:3.5}
+  .fat{stroke-width:8}
+  .coral{stroke:var(--coral)}
+  .blue{stroke:var(--blue)}
+  .amber{stroke:var(--amber)}
+  .green{stroke:var(--green)}
+  .muted{stroke:var(--muted)}
+  .fill-none{fill:none}
+
+  text{font-family:inherit;fill:var(--ink)}
+  .t-title{font-size:76px;font-weight:700}
+  .t-big{font-size:120px;font-weight:700}
+  .t-h{font-size:44px;font-weight:700}
+  .t-m{font-size:30px}
+  .t-s{font-size:24px}
+  .tx-coral{fill:var(--coral)}
+  .tx-blue{fill:var(--blue)}
+  .tx-green{fill:var(--green)}
+  .tx-amber{fill:var(--amber)}
+  .tx-muted{fill:var(--muted)}
+  .center{text-anchor:middle}
+
+  /* pop-in for solid elements / text */
+  .pop{opacity:0;transform-box:fill-box;transform-origin:center}
+  .pop.go{animation:pop .55s cubic-bezier(.2,1.4,.4,1) both}
+  @keyframes pop{
+    0%{opacity:0;transform:scale(.4) rotate(-4deg)}
+    100%{opacity:1;transform:scale(1) rotate(0)}
+  }
+  .fade{opacity:0}
+  .fade.go{animation:fade .6s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  /* subtitle / caption bar */
+  #caption{
+    position:fixed;left:50%;bottom:84px;transform:translateX(-50%);
+    z-index:5;
+    max-width:min(90vw,1000px);
+    background:var(--ink);color:var(--paper);
+    padding:12px 26px;border-radius:14px;
+    font-size:clamp(17px,2.3vw,25px);line-height:1.3;text-align:center;
+    box-shadow:4px 5px 0 rgba(45,42,38,.25);
+    opacity:0;transition:opacity .3s ease, transform .3s ease;
+    pointer-events:none;
+  }
+  #caption.show{opacity:1}
+
+  /* controls */
+  #bar{position:relative;height:6px;background:rgba(45,42,38,.12)}
+  #fill{position:absolute;left:0;top:0;height:100%;width:0;background:var(--coral)}
+  #controls{
+    display:flex;align-items:center;gap:14px;justify-content:center;
+    padding:10px;font-size:14px;color:var(--ink);
+  }
+  #controls button{
+    font-family:inherit;font-size:16px;cursor:pointer;
+    background:var(--paper);color:var(--ink);
+    border:3px solid var(--ink);border-radius:10px;
+    padding:6px 14px;box-shadow:2px 3px 0 rgba(45,42,38,.25);
+    transition:transform .08s ease;
+  }
+  #controls button:hover{transform:translateY(-1px)}
+  #controls button:active{transform:translate(1px,2px);box-shadow:1px 1px 0 rgba(45,42,38,.25)}
+  #counter{min-width:70px;text-align:center;color:var(--muted)}
+  .hint{color:var(--muted);font-size:12px}
+
+  /* start gate overlay (unlocks browser audio on first click) */
+  #startgate{
+    position:fixed;inset:0;z-index:50;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(251,247,236,.94);
+    cursor:pointer;transition:opacity .4s ease;
+    background-image:
+      linear-gradient(rgba(45,42,38,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45,42,38,.04) 1px, transparent 1px);
+    background-size:26px 26px;
+  }
+  #startgate.hide{opacity:0;pointer-events:none}
+  .gatebox{text-align:center;transform:rotate(-1.2deg)}
+  .gateicon{font-size:72px;animation:bob 1.8s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .gatetitle{font-size:clamp(30px,5vw,54px);font-weight:700;color:var(--coral);margin:10px 0}
+  .gatehint{font-size:clamp(16px,2.4vw,24px);color:var(--ink);
+    border:3px solid var(--ink);border-radius:14px;padding:10px 22px;display:inline-block;
+    box-shadow:3px 4px 0 rgba(45,42,38,.2);background:#fff}
+</style>
+</head>
+<body>
+
+<!-- shared sketch/wobble filter -->
+<svg width="0" height="0" style="position:absolute">
+  <filter id="sketch" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2"/>
+  </filter>
+</svg>
+
+<div id="startgate">
+  <div class="gatebox">
+    <div class="gateicon">🧠</div>
+    <div class="gatetitle">Architects Mastering AI</div>
+    <div class="gatehint">Click anywhere to play with narration</div>
+  </div>
+</div>
+
+<div id="stage">
+
+  <!-- 1 · TITLE -->
+  <section class="scene" data-dur="4800" data-sub="Salesforce architects, mastering the mechanisms of AI.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-title center fade" data-delay="150" x="500" y="210">Architects</text>
+        <text class="t-title center tx-coral fade" data-delay="500" x="500" y="300">mastering AI</text>
+        <!-- brain + spark doodle -->
+        <path class="ink blue draw" data-delay="1100" data-dur="800" d="M430 400 Q400 380 420 420 Q400 452 442 462 Q462 492 500 472 Q538 492 558 462 Q600 452 580 420 Q600 380 570 400 Q560 372 500 376 Q440 372 430 400 Z"/>
+        <path class="ink amber draw fat" data-delay="2000" data-dur="400" d="M500 418 L488 446 L505 446 L494 474"/>
+        <text class="t-s center tx-muted fade" data-delay="2500" x="500" y="540">fluency vs. assets — and how to train it</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 2 · TWO LEVERS RECAP -->
+  <section class="scene" data-dur="7000" data-sub="The theory names two levers: AI Fluency — a human skill — and AI Assets, the packaged solutions.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center fade" data-delay="150" x="500" y="90">Two levers</text>
+        <!-- divider -->
+        <path class="ink muted draw thin" data-delay="600" data-dur="700" d="M500 140 L500 470"/>
+        <!-- left: fluency -->
+        <text class="t-h center tx-blue fade" data-delay="900" x="270" y="185">AI FLUENCY</text>
+        <circle class="pop" data-delay="1300" cx="270" cy="285" r="36" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
+        <path class="ink blue draw" data-delay="1600" data-dur="600" d="M220 395 Q270 330 320 395"/>
+        <text class="t-s center tx-muted fade" data-delay="2100" x="270" y="450">a human skill — basic AI</text>
+        <!-- right: assets -->
+        <text class="t-h center tx-green fade" data-delay="2500" x="730" y="185">AI ASSETS</text>
+        <rect class="pop" data-delay="2900" x="640" y="250" width="180" height="100" rx="12" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+        <text class="t-s center tx-green fade" data-delay="3200" x="730" y="308">packaged tool</text>
+        <text class="t-s center tx-muted fade" data-delay="3600" x="730" y="450">complete AI solutions</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 3 · MASTER vs KNOW -->
+  <section class="scene" data-dur="6600" data-sub="An architect must master the first and know the second — two very different efforts.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center fade" data-delay="150" x="500" y="90">Master vs. know</text>
+        <!-- fluency -> master -->
+        <text class="t-m center tx-blue fade" data-delay="500" x="270" y="195">Fluency</text>
+        <path class="ink blue draw fat" data-delay="900" data-dur="500" d="M180 240 L360 240 M340 226 L360 240 L340 254"/>
+        <text class="t-h center fade" data-delay="1400" x="270" y="330">MASTER</text>
+        <text class="t-s center tx-muted fade" data-delay="1800" x="270" y="390">train it in yourself</text>
+        <!-- assets -> know -->
+        <text class="t-m center tx-green fade" data-delay="2300" x="730" y="195">Assets</text>
+        <path class="ink green draw fat" data-delay="2700" data-dur="500" d="M640 240 L820 240 M800 226 L820 240 L800 254"/>
+        <text class="t-h center fade" data-delay="3200" x="730" y="330">KNOW</text>
+        <text class="t-s center tx-muted fade" data-delay="3600" x="730" y="390">which one fits which chunk</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 4 · THE TRICKY PART — MANY VENDORS -->
+  <section class="scene" data-dur="8400" data-sub="Here is the tricky part. Many vendors offer similar capabilities in different shapes — Gemini, Codex, Cursor, Claude Code, ChatGPT.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center fade" data-delay="150" x="500" y="80">The tricky part</text>
+        <text class="t-m center tx-muted fade" data-delay="500" x="500" y="130">same capability, different shapes</text>
+        <!-- vendor chips -->
+        <g><rect class="pop" data-delay="900" x="110" y="185" width="180" height="62" rx="14" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
+           <text class="t-s center tx-blue fade" data-delay="1050" x="200" y="224">Gemini</text></g>
+        <g><rect class="pop" data-delay="1200" x="360" y="170" width="170" height="62" rx="14" fill="#fdf3d9" stroke="#f2b01e" stroke-width="4"/>
+           <text class="t-s center tx-amber fade" data-delay="1350" x="445" y="209">Codex</text></g>
+        <g><rect class="pop" data-delay="1500" x="600" y="185" width="170" height="62" rx="14" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="1650" x="685" y="224">Cursor</text></g>
+        <g><rect class="pop" data-delay="1800" x="220" y="280" width="240" height="62" rx="14" fill="#fdeee9" stroke="#e8503a" stroke-width="4"/>
+           <text class="t-s center tx-coral fade" data-delay="1950" x="340" y="319">Claude Code</text></g>
+        <g><rect class="pop" data-delay="2100" x="520" y="280" width="200" height="62" rx="14" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
+           <text class="t-s center tx-blue fade" data-delay="2250" x="620" y="319">ChatGPT</text></g>
+        <!-- specific = assets -->
+        <text class="t-s center tx-muted fade" data-delay="2800" x="500" y="420">more specific ones — Elements.cloud, LucidAI —</text>
+        <text class="t-s center tx-coral fade" data-delay="3300" x="500" y="460">are already AI Assets, not Fluency</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 5 · LIKE EXCEL — FLUENCY = JARGON + NEW THINKING -->
+  <section class="scene" data-dur="8200" data-sub="Like learning Excel twenty years ago, teams now must learn AI. Fluency means two things: the basic jargon, and reshaping how you think.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center fade" data-delay="150" x="500" y="80">Like learning Excel</text>
+        <!-- excel grid -->
+        <rect class="pop" data-delay="600" x="130" y="150" width="150" height="110" rx="6" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+        <path class="ink green draw thin" data-delay="1000" data-dur="500" d="M130 187 L280 187 M130 224 L280 224 M180 150 L180 260 M230 150 L230 260"/>
+        <!-- arrow -->
+        <path class="ink draw fat" data-delay="1500" data-dur="500" d="M310 205 L430 205 M410 190 L430 205 L410 220"/>
+        <text class="t-big center tx-coral fade" data-delay="2000" x="560" y="240">AI</text>
+        <!-- two things -->
+        <text class="t-m center tx-blue fade" data-delay="2500" x="500" y="360">1 · the basic jargon</text>
+        <text class="t-m center tx-coral fade" data-delay="3000" x="500" y="425">2 · reshape how you think</text>
+        <text class="t-s center tx-muted fade" data-delay="3500" x="500" y="480">the real muscle — not copied, developed</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 6 · AI PILLS = VITAMINS -->
+  <section class="scene" data-dur="7600" data-sub="In Spain, the team trains fluency with AI Pills — vitamins. They don't remove the effort; they help you build it.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center fade" data-delay="150" x="500" y="110">AI Pills</text>
+        <text class="t-m center tx-muted fade" data-delay="500" x="500" y="160">vitamins for fluency</text>
+        <!-- capsule 1 (coral) -->
+        <path class="ink coral draw fat" data-delay="900" data-dur="600" d="M290 255 Q290 224 332 224 L420 224 Q462 224 462 255 Q462 286 420 286 L332 286 Q290 286 290 255 Z"/>
+        <path class="ink coral draw thin" data-delay="1500" data-dur="300" d="M376 226 L376 284"/>
+        <!-- capsule 2 (blue) -->
+        <path class="ink blue draw fat" data-delay="1800" data-dur="600" d="M540 330 Q540 299 582 299 L670 299 Q712 299 712 330 Q712 361 670 361 L582 361 Q540 361 540 330 Z"/>
+        <path class="ink blue draw thin" data-delay="2400" data-dur="300" d="M626 301 L626 359"/>
+        <text class="t-s center tx-muted fade" data-delay="2900" x="500" y="450">effort still required: time, install, research</text>
+        <text class="t-s center tx-coral fade" data-delay="3300" x="500" y="490">the pill just helps it develop</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 7 · PILL · SHARE USE CASES (SLACK) -->
+  <section class="scene" data-dur="8400" data-sub="One pill: a Slack workflow. Architects post how they used AI in a novel or time-saving way — and how to reproduce it. Then it's shared with the whole team.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center fade" data-delay="150" x="500" y="80">Pill · share use cases</text>
+        <!-- message card -->
+        <rect class="pop" data-delay="600" x="110" y="150" width="360" height="180" rx="14" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
+        <text class="t-s tx-blue fade" data-delay="900" x="140" y="200">#ai-use-cases</text>
+        <path class="ink blue draw thin" data-delay="1200" data-dur="500" d="M140 232 L440 232 M140 268 L440 268 M140 302 L350 302"/>
+        <text class="t-s center tx-muted fade" data-delay="1700" x="290" y="375">"what I did + how to reproduce it"</text>
+        <!-- arrow to team -->
+        <path class="ink draw fat" data-delay="2200" data-dur="500" d="M500 240 L600 240 M580 225 L600 240 L580 255"/>
+        <!-- team dots -->
+        <circle class="pop" data-delay="2600" cx="700" cy="195" r="26" fill="#fdeee9" stroke="#e8503a" stroke-width="4"/>
+        <circle class="pop" data-delay="2750" cx="785" cy="245" r="26" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+        <circle class="pop" data-delay="2900" cx="700" cy="295" r="26" fill="#fdf3d9" stroke="#f2b01e" stroke-width="4"/>
+        <text class="t-s center tx-muted fade" data-delay="3300" x="745" y="375">the whole team</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 8 · PILL · FRIDAY SESSIONS -->
+  <section class="scene" data-dur="7000" data-sub="Another pill: every Friday, a session dedicated to sharing how AI improved a real use case.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center fade" data-delay="150" x="500" y="80">Pill · Friday sessions</text>
+        <!-- calendar -->
+        <rect class="pop" data-delay="600" x="380" y="140" width="240" height="180" rx="12" fill="#fff" stroke="#2d2a26" stroke-width="4"/>
+        <path class="ink coral draw fat" data-delay="1000" data-dur="400" d="M380 185 L620 185"/>
+        <text class="t-h center tx-coral fade" data-delay="1500" x="500" y="270">FRI</text>
+        <!-- people row -->
+        <circle class="pop" data-delay="2000" cx="260" cy="420" r="24" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
+        <circle class="pop" data-delay="2150" cx="400" cy="455" r="24" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+        <circle class="pop" data-delay="2300" cx="560" cy="455" r="24" fill="#fdf3d9" stroke="#f2b01e" stroke-width="4"/>
+        <circle class="pop" data-delay="2450" cx="700" cy="420" r="24" fill="#fdeee9" stroke="#e8503a" stroke-width="4"/>
+        <text class="t-s center tx-muted fade" data-delay="2900" x="500" y="520">weekly, exclusive — how AI improved real work</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 9 · PILL · KSO ASSETS USE AI (OAT) -->
+  <section class="scene" data-dur="7800" data-sub="And in Iberia, every KSO asset must use AI — to build it, or inside the asset itself, like the Org Assessment Tool.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center fade" data-delay="150" x="500" y="80">Pill · KSO assets use AI</text>
+        <rect class="pop" data-delay="600" x="300" y="150" width="400" height="210" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="5"/>
+        <text class="t-m center tx-green fade" data-delay="900" x="500" y="205">KSO asset</text>
+        <!-- AI chip inside -->
+        <rect class="pop" data-delay="1400" x="400" y="235" width="200" height="85" rx="12" fill="#fdeee9" stroke="#e8503a" stroke-width="4"/>
+        <text class="t-h center tx-coral fade" data-delay="1700" x="500" y="293">AI</text>
+        <text class="t-s center tx-muted fade" data-delay="2200" x="500" y="415">built with AI — or the asset uses it</text>
+        <text class="t-s center tx-blue fade" data-delay="2700" x="500" y="455">e.g. OAT — Org Assessment Tool</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 10 · CLIMAX · UNDERSTAND, DON'T PASTE -->
+  <section class="scene" data-dur="8800" data-sub="The subtlest pill: knowing what to understand and what to copy. A skill is not an asset to paste — it opens your mind to a use case you could have solved yourself.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center fade" data-delay="150" x="500" y="80">Understand, don't paste</text>
+        <!-- skill card left -->
+        <rect class="pop" data-delay="500" x="110" y="170" width="280" height="160" rx="14" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
+        <text class="t-m center tx-blue fade" data-delay="800" x="250" y="245">a skill</text>
+        <text class="t-s center tx-muted fade" data-delay="1100" x="250" y="295">not an asset to copy</text>
+        <!-- arrow -->
+        <path class="ink draw fat" data-delay="1600" data-dur="500" d="M410 250 L525 250 M505 235 L525 250 L505 265"/>
+        <!-- lightbulb right -->
+        <circle class="pop" data-delay="2100" cx="720" cy="230" r="58" fill="#fdf3d9" stroke="#f2b01e" stroke-width="4"/>
+        <path class="ink amber draw thin" data-delay="2500" data-dur="400" d="M702 292 L738 292 M708 312 L732 312"/>
+        <text class="t-h center tx-amber fade" data-delay="2700" x="720" y="245">idea</text>
+        <text class="t-s center tx-coral fade" data-delay="3200" x="720" y="360">it opens your mind to a use case</text>
+        <text class="t-s center tx-muted fade" data-delay="3700" x="500" y="450">one you could have solved without copying</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 11 · WHERE EACH ONE LIVES -->
+  <section class="scene" data-dur="8400" data-sub="The goal is not to reuse someone's work — it is to build the muscle to see the use case. Reuse lives in the Asset; the muscle lives in Fluency.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center fade" data-delay="150" x="500" y="90">Where each one lives</text>
+        <!-- reuse -> asset -->
+        <text class="t-m center tx-green fade" data-delay="500" x="270" y="195">reuse</text>
+        <path class="ink green draw fat" data-delay="900" data-dur="500" d="M270 215 L270 300 M255 280 L270 300 L285 280"/>
+        <rect class="pop" data-delay="1400" x="180" y="310" width="180" height="95" rx="12" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+        <text class="t-s center tx-green fade" data-delay="1700" x="270" y="365">AI Asset</text>
+        <!-- muscle -> fluency -->
+        <text class="t-m center tx-blue fade" data-delay="2200" x="730" y="195">the muscle</text>
+        <path class="ink blue draw fat" data-delay="2600" data-dur="500" d="M730 215 L730 300 M715 280 L730 300 L745 280"/>
+        <rect class="pop" data-delay="3100" x="640" y="310" width="180" height="95" rx="12" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
+        <text class="t-s center tx-blue fade" data-delay="3400" x="730" y="365">AI Fluency</text>
+        <text class="t-s center tx-muted fade" data-delay="3900" x="500" y="470">confuse them, and you never train fluency</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 12 · CLOSE -->
+  <section class="scene" data-dur="6000" data-sub="Master the fluency, know the assets. The tools keep changing — the way of thinking is what compounds.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-title center fade" data-delay="150" x="500" y="230">Master the fluency</text>
+        <text class="t-title center tx-coral fade" data-delay="700" x="500" y="325">know the assets</text>
+        <path class="ink amber draw fat" data-delay="1400" data-dur="500" d="M415 400 L475 435 L600 355"/>
+        <text class="t-s center tx-muted fade" data-delay="2100" x="500" y="500">— The Chunking Project Theory</text>
+      </g>
+    </svg>
+  </section>
+
+</div>
+
+<div id="caption"></div>
+<div id="bar"><div id="fill"></div></div>
+<div id="controls">
+  <button id="prev" title="Previous (←)">◀</button>
+  <button id="play" title="Play / Pause (space)">❚❚</button>
+  <button id="next" title="Next (→)">▶</button>
+  <button id="replay" title="Replay (R)">↻ replay</button>
+  <button id="mute" title="Mute / Unmute (M)">🔊</button>
+  <span id="counter">1 / 12</span>
+  <span class="hint">space=play/pause · ←/→=scene · M=mute · R=replay</span>
+</div>
+
+<script>
+(function(){
+  const scenes   = Array.from(document.querySelectorAll('.scene'));
+  const caption  = document.getElementById('caption');
+  const fill     = document.getElementById('fill');
+  const counter  = document.getElementById('counter');
+  const playBtn  = document.getElementById('play');
+  const muteBtn  = document.getElementById('mute');
+  const durs     = scenes.map(s => parseInt(s.dataset.dur,10) || 5000);
+  const total    = durs.reduce((a,b)=>a+b,0);
+  const cumBefore= durs.map((_,i)=> durs.slice(0,i).reduce((a,b)=>a+b,0));
+
+  let idx = 0;
+  let playing = true;
+  let sceneT0 = 0;        // performance.now() when current scene (re)started counting
+  let accrued = 0;        // ms already counted for current scene (across pauses)
+
+  /* ---- narration (Web Speech API, self-contained, no external audio) ---- */
+  const synth   = window.speechSynthesis;
+  const hasTTS  = !!synth;
+  let muted     = false;
+  let started   = false;   // browsers block audio until first user gesture
+  let speechDone= true;    // gates scene advance when audio is on
+  let voice     = null;
+  const LEAD_MS = 450;     // let the drawing begin before the voice starts
+
+  function pickVoice(){
+    if (!hasTTS) return;
+    const vs = synth.getVoices();
+    voice = vs.find(v => /en[-_]GB/i.test(v.lang) && /female|Google|Serena|Kate|Libby|Sonia/i.test(v.name))
+         || vs.find(v => /^en[-_]US/i.test(v.lang) && /Google|Samantha|Jenny|Aria/i.test(v.name))
+         || vs.find(v => /^en/i.test(v.lang))
+         || vs[0] || null;
+  }
+  if (hasTTS){
+    pickVoice();
+    synth.onvoiceschanged = pickVoice;
+  }
+
+  let leadTimer = null;
+  let speakGen  = 0;       // generation guard: invalidates stale utterances on scene change
+  // Chrome's speech engine truncates long single utterances. Split into short
+  // clauses and chain them — each clause resets the engine's watchdog.
+  function splitClauses(text){
+    return text.match(/[^.!?;:]+[.!?;:]*/g) || [text];
+  }
+  function speak(text){
+    if (!hasTTS || muted || !started){ speechDone = true; return; }
+    synth.cancel();
+    clearTimeout(leadTimer);
+    speechDone = false;
+    const gen = ++speakGen;                 // this call owns generation `gen`
+    const clauses = splitClauses(text).map(s => s.trim()).filter(Boolean);
+    leadTimer = setTimeout(()=>{
+      if (gen !== speakGen || muted || !playing){ if(gen===speakGen) speechDone = true; return; }
+      let i = 0;
+      const sayNext = ()=>{
+        if (gen !== speakGen) return;        // scene changed — abandon quietly
+        if (i >= clauses.length){ speechDone = true; return; }
+        const u = new SpeechSynthesisUtterance(clauses[i++]);
+        if (voice) u.voice = voice;
+        u.rate = 0.98; u.pitch = 1.0; u.lang = voice ? voice.lang : 'en-US';
+        u.onend   = ()=>{ if (gen === speakGen) sayNext(); };
+        u.onerror = ()=>{ if (gen === speakGen) sayNext(); }; // skip broken clause, keep going
+        synth.speak(u);
+      };
+      sayNext();
+    }, LEAD_MS);
+  }
+
+  function playAnims(scene){
+    // draw-on paths
+    scene.querySelectorAll('.draw').forEach(el=>{
+      let len = 300;
+      try { len = el.getTotalLength() || 300; } catch(e){}
+      const delay = parseFloat(el.dataset.delay || 0);
+      const dur   = parseFloat(el.dataset.dur   || 900);
+      el.style.transition = 'none';
+      el.style.strokeDasharray  = len;
+      el.style.strokeDashoffset = len;
+      el.getBoundingClientRect(); // reflow
+      el.style.transition = `stroke-dashoffset ${dur}ms cubic-bezier(.65,0,.35,1) ${delay}ms`;
+      el.style.strokeDashoffset = '0';
+    });
+    // pop / fade elements — restart CSS animation
+    scene.querySelectorAll('.pop, .fade').forEach(el=>{
+      el.classList.remove('go');
+      const delay = parseFloat(el.dataset.delay || 0);
+      el.style.animationDelay = delay + 'ms';
+      void el.offsetWidth; // reflow
+      el.classList.add('go');
+    });
+  }
+
+  function activate(i){
+    idx = (i + scenes.length) % scenes.length;
+    scenes.forEach((s,k)=> s.classList.toggle('active', k===idx));
+    const s = scenes[idx];
+    playAnims(s);
+    // caption
+    caption.textContent = s.dataset.sub || '';
+    caption.classList.remove('show');
+    void caption.offsetWidth;
+    caption.classList.add('show');
+    counter.textContent = (idx+1) + ' / ' + scenes.length;
+    accrued = 0;
+    sceneT0 = performance.now();
+    speak(s.dataset.sub || '');
+  }
+
+  function next(){ activate(idx+1); }
+  function prev(){ activate(idx-1); }
+
+  function setPlaying(p){
+    playing = p;
+    playBtn.textContent = p ? '❚❚' : '▶';
+    if (p){ sceneT0 = performance.now(); }
+    else if (hasTTS){ speakGen++; synth.cancel(); clearTimeout(leadTimer); }
+  }
+
+  function loop(now){
+    if (playing){
+      const elapsed = accrued + (now - sceneT0);
+      const shown = Math.min(elapsed, durs[idx]);
+      fill.style.width = ((cumBefore[idx] + shown) / total * 100) + '%';
+      // advance only when the timed duration passed AND the narration finished
+      const audioGate = (muted || !started) ? true : speechDone;
+      if (elapsed >= durs[idx] && audioGate){
+        if (idx === scenes.length - 1){
+          setPlaying(false);       // stop at the end
+          fill.style.width = '100%';
+        } else {
+          next();
+        }
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+
+  // controls
+  playBtn.addEventListener('click', ()=>{
+    if (playing){
+      accrued += performance.now() - sceneT0; // bank progress
+      setPlaying(false);
+    } else {
+      if (idx === scenes.length-1 && accrued >= durs[idx]) { activate(0); }
+      setPlaying(true);
+    }
+  });
+  document.getElementById('next').addEventListener('click', ()=>{ next(); setPlaying(true); });
+  document.getElementById('prev').addEventListener('click', ()=>{ prev(); setPlaying(true); });
+  document.getElementById('replay').addEventListener('click', ()=>{ activate(0); setPlaying(true); });
+
+  function setMuted(m){
+    muted = m;
+    muteBtn.textContent = m ? '🔇' : '🔊';
+    if (m && hasTTS){ speakGen++; synth.cancel(); clearTimeout(leadTimer); speechDone = true; }
+    else if (!m && playing){ speak(scenes[idx].dataset.sub || ''); } // start narrating current scene
+  }
+  muteBtn.addEventListener('click', ()=> setMuted(!muted));
+
+  // Start gate: browsers block speech until a user gesture.
+  // Hold on scene 1 until the user clicks, then begin with narration.
+  const gate = document.getElementById('startgate');
+  function beginShow(){
+    if (started) return;
+    started = true;
+    gate.classList.add('hide');
+    setTimeout(()=>gate.remove(), 500);
+    activate(0);            // restart scene 1 anims cleanly
+    setPlaying(true);
+    if (hasTTS && !muted) speak(scenes[0].dataset.sub || '');
+  }
+  gate.addEventListener('click', beginShow);
+
+  document.addEventListener('keydown', e=>{
+    if (!started){ beginShow(); return; }   // any key also starts the show
+    if (e.code === 'Space'){ e.preventDefault(); playBtn.click(); }
+    else if (e.code === 'ArrowRight'){ next(); setPlaying(true); }
+    else if (e.code === 'ArrowLeft'){ prev(); setPlaying(true); }
+    else if (e.key === 'r' || e.key === 'R'){ activate(0); setPlaying(true); }
+    else if (e.key === 'm' || e.key === 'M'){ setMuted(!muted); }
+  });
+
+  // prime scene 1 visuals behind the gate, but hold playback until user clicks
+  activate(0);
+  setPlaying(false);
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

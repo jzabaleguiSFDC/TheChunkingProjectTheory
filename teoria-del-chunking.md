@@ -126,6 +126,34 @@ El efecto **principal** de ambas palancas es **encoger la caja** (el trabajo int
 
 La puerta sigue siendo del cliente y sigue en el camino crítico. La buena práctica solo **recorta su latencia**, no la elimina.
 
+## Cómo los arquitectos dominan la IA: Fluency vs Assets
+
+Las dos palancas exigen dos cosas distintas de las personas. Un arquitecto de Salesforce debe **dominar la AI Fluency** y **conocer los AI Assets** (las AI Solutions). No son el mismo esfuerzo ni se adquieren igual.
+
+- **Dominar la Fluency** — es una habilidad interna, como aprender a usar Excel hace veinte años. No se compra; se entrena.
+- **Conocer los Assets** — es saber qué soluciones existen, qué chunk resuelve cada una y cuándo tirar de ellas (SEAP, LucidAI, OAT, Setup Agents…). No hay que reconstruirlas: hay que saber usarlas.
+
+### El *tricky part*: entrenar la Fluency con muchos vendors
+
+Lo difícil no es querer, es **cómo**. El mercado ofrece capacidades **parecidas de formas distintas** — Gemini, Codex, Cursor, Claude Code, ChatGPT — y por encima soluciones más específicas (Elements.cloud, LucidAI…) que ya son **AI Assets**, no Fluency. Para la teoría, dominar la Fluency es **dos cosas**:
+
+1. **Conocer el jargon básico** — el vocabulario mínimo para operar (prompt, contexto, agente, modelo, memoria…).
+2. **Amoldar la mente** — sobre todo, adoptar la **nueva forma de pensar**. Esto es el verdadero músculo, y no se copia: se desarrolla.
+
+### AI Pills: vitaminas para la Fluency
+
+En España el equipo fomenta la Fluency con **AI Pills**: pequeñas iniciativas que actúan como **vitaminas**. No quitan el esfuerzo —hay que dedicar tiempo, instalar, investigar— pero **ayudan a desarrollarlo**. Vienen de varias formas:
+
+1. **Compartir casos de uso (workflow de Slack)** — los arquitectos envían de qué forma innovadora, o que les haya ahorrado tiempo, han usado la IA, **y cómo reproducirlo**. Se comparte con el resto del equipo.
+2. **Sesiones de socialización (viernes)** — sesiones semanales exclusivas para compartir cómo la IA ha mejorado casos de uso reales.
+3. **KSO assets con IA (Iberia)** — todos los assets producidos como parte de los KSOs deben **usar IA**: o para crearlos, o el propio asset la usa (p. ej. el **OAT — Org Assessment Tool**).
+
+### La Pill más sutil: entender qué copiar y qué no
+
+La última forma de Pill es aprender **qué hay que entender y qué hay que copiar y pegar**. En Iberia se entiende que los **skills** son muy útiles — pero **no para copiar y pegar como si fueran un asset**. Un asset es otra cosa: **autocontenido y elaborado**. Un skill sirve para **abrir la mente**: ese skill está cubriendo un **caso de uso** que podrías haber resuelto **sin copiarlo**, si se te hubiera ocurrido la idea.
+
+El objetivo no es reutilizar el trabajo del otro, sino **desarrollar el músculo de ver el caso de uso**. La reutilización vive en el **AI Asset**; el músculo vive en la **AI Fluency**. Confundirlos es tratar la Fluency como si fuera un asset — y así no se entrena.
+
 ## Taxonomía de chunks (v2)
 
 Cada chunk se describe por su **puerta de entrada** (qué abre el cliente para empezar), su **trabajo interno** (color según qué lo topa) y su **puerta de salida** (qué abre el cliente para cerrar). Las herramientas mostradas son el stack actual en uso.

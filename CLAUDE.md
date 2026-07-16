@@ -32,8 +32,10 @@ The folder is currently empty. Expected layout as content lands:
 The decks are static files — open directly, or serve the folder if a local URL is preferred:
 
 ```bash
-open intro.html                  # animation 1: introduces the theory
-open chunk-definition.html       # animation 2: anatomy of a chunk (gates + internal work)
+open html-animations/1-intro.html                # animation 1: introduces the theory
+open html-animations/2-chunk-definition.html     # animation 2: anatomy of a chunk (gates + internal work)
+open html-animations/3-salesforce-fit.html       # animation 3: where the theory lands in Salesforce
+open html-animations/4-architects-mastering-ai.html  # animation 4: architects mastering AI (fluency vs assets)
 python3 -m http.server 8000      # then visit http://localhost:8000
 ```
 
