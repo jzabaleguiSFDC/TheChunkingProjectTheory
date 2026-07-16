@@ -19,7 +19,7 @@
   body{
     background:var(--paper);
     color:var(--ink);
-    font-family:"Comic Sans MS","Chalkboard SE","Comic Neue","Segoe Print","Bradley Hand",cursive,sans-serif;
+    font-family:"Comic Neue","Chalkboard SE","Segoe Print","Bradley Hand","Comic Sans MS",cursive,sans-serif;
     overflow:hidden;
     display:flex;flex-direction:column;
     /* faint paper grid */
@@ -203,11 +203,11 @@
     </svg>
   </section>
 
-  <!-- 3 · AI SOLUTIONS RECAP: one box each -->
-  <section class="scene" data-dur="7200" data-sub="So far, every AI Solution shrinks one box: Setup Agents, Slackbot, LucidAI, OAT — each one a single chunk.">
+  <!-- 3 · AI ASSETS RECAP: one box each -->
+  <section class="scene" data-dur="7200" data-sub="So far, every AI Asset shrinks one box: Setup Agents, Slackbot, LucidAI, OAT — each one a single chunk.">
     <svg class="board" viewBox="0 0 1000 620">
       <g filter="url(#sketch)">
-        <text class="t-h center tx-green fade" data-delay="150" x="500" y="110">AI Solutions today</text>
+        <text class="t-h center tx-green fade" data-delay="150" x="500" y="110">AI Assets today</text>
         <!-- four small green boxes, each labelled -->
         <g><rect class="pop" data-delay="700" x="90"  y="230" width="200" height="120" rx="12" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
            <text class="t-s center tx-green fade" data-delay="900" x="190" y="298">Setup Agents</text></g>
@@ -297,7 +297,7 @@
   </section>
 
   <!-- 6b · AI DELIVERY (the default without Quantum Leap) -->
-  <section class="scene" data-dur="8200" data-sub="Without Quantum Leap, what you actually have is AI Delivery: the AI helps you deliver faster inside the boxes, but the gates never move.">
+  <section class="scene" data-dur="8200" data-sub="Without Quantum Leap, what you actually have is AI Delivery: the AI helps you deliver faster by shrinking the boxes, but the gates never move.">
     <svg class="board" viewBox="0 0 1000 620">
       <g filter="url(#sketch)">
         <text class="t-h center tx-amber fade" data-delay="150" x="500" y="100">AI Delivery</text>
@@ -417,7 +417,7 @@
   </section>
 
   <!-- 10 · THE MAP -->
-  <section class="scene" data-dur="8400" data-sub="The full map: Fluency, Solutions and SEAP shrink boxes — that is AI Delivery. Only Quantum Leap moves the gates.">
+  <section class="scene" data-dur="8400" data-sub="The full map: Fluency, Assets and SEAP shrink boxes — that is AI Delivery. Only Quantum Leap moves the gates.">
     <svg class="board" viewBox="0 0 1000 620">
       <g filter="url(#sketch)">
         <text class="t-h center fade" data-delay="150" x="500" y="90">the map</text>
@@ -426,7 +426,7 @@
         <g><rect class="pop" data-delay="900"  x="120" y="185" width="340" height="52" rx="12" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
            <text class="t-s center tx-green fade" data-delay="1050" x="290" y="219">AI Fluency</text></g>
         <g><rect class="pop" data-delay="1300" x="120" y="250" width="340" height="52" rx="12" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
-           <text class="t-s center tx-green fade" data-delay="1450" x="290" y="284">AI Solutions</text></g>
+           <text class="t-s center tx-green fade" data-delay="1450" x="290" y="284">AI Assets</text></g>
         <g><rect class="pop" data-delay="1700" x="120" y="315" width="340" height="52" rx="12" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
            <text class="t-s center tx-blue fade" data-delay="1850" x="290" y="349">SEAP (many boxes)</text></g>
         <text class="t-s center tx-amber fade" data-delay="2200" x="290" y="405">↑ all of this = AI Delivery</text>
@@ -531,7 +531,7 @@
         if (i >= clauses.length){ speechDone = true; return; }
         const u = new SpeechSynthesisUtterance(clauses[i++]);
         if (voice) u.voice = voice;
-        u.rate = 0.98; u.pitch = 1.0; u.lang = voice ? voice.lang : 'en-US';
+        u.rate = 1.12; u.pitch = 1.0; u.lang = voice ? voice.lang : 'en-US';
         u.onend   = ()=>{ if (gen === speakGen) sayNext(); };
         u.onerror = ()=>{ if (gen === speakGen) sayNext(); }; // skip broken clause, keep going
         synth.speak(u);

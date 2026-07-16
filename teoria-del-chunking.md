@@ -48,12 +48,24 @@ Todo chunk tiene **tres partes**, no una:
 
 Principios:
 
-- **Ambas puertas las abre el cliente.** La IA **no abre puertas** — solo acelera el trabajo entre ellas.
+- **Ambas puertas las abre el cliente** — esa decisión es suya y nadie se la quita. Pero *abrir* la puerta y *acelerar que el cliente la abra* son cosas distintas: el integrador y la IA no giran la llave, pero sí **recortan la latencia** hasta que el cliente la gira (preparan el artefacto listo para decidir, pre-estructuran el input que el cliente debe dar, resuelven dudas antes de la reunión). La puerta sigue siendo del cliente y sigue en el camino crítico; lo que se trabaja es **cuánto tarda en abrirse**, no quién la abre.
 - **Las puertas son los puntos de inflexión del proyecto.** Son, exactamente, las dependencias con el cliente. El camino crítico se dibuja puerta a puerta.
 - **El trabajo y la puerta son cosas distintas.** El trabajo de redactar un SOW se comprime muchísimo; la *firma* de ese SOW es una puerta y no se comprime. No hay que confundir el color del trabajo con la puerta que lo rodea.
 - **Un chunk bloqueado** es un chunk con la puerta de entrada cerrada. El trabajo interno —aunque sea verde y la IA lo haría en horas— ni siquiera empieza. Ejemplos típicos:
   - **Integraciones** — bloqueadas sin las **especificaciones de las APIs** (y accesos) del cliente o de terceros.
   - **Migración de datos** — bloqueada sin los **datos limpios** del cliente.
+
+### Dónde se atasca el cliente, en concreto
+
+«Puerta» suena abstracto. En un proyecto real son puntos muy identificables donde el proyecto se para a esperar al cliente:
+
+- **Comité de aprobación** — la decisión de diseño necesita un comité que se reúne cada dos semanas; la IA no adelanta esa fecha.
+- **Accesos y seguridad** — credenciales de sandbox, permisos de red, alta en sistemas: pasan por el equipo de IT/seguridad del cliente en su propio ciclo.
+- **Firma legal / procurement** — el SOW o el cambio de scope espera a legal y compras; el redactado se comprime, la firma no.
+- **Datos y specs** — datos limpios para migrar, especificaciones de API de un tercero: llegan cuando el cliente (o su proveedor) los entrega.
+- **Disponibilidad de stakeholders de negocio** — la persona que valida requerimientos o hace UAT tiene su trabajo del día a día; la reunión se agenda a su ritmo, no al del proyecto.
+
+Ese último punto es el más difícil de mover, y conviene decirlo sin rodeos: **la velocidad del cliente es estructuralmente rígida**. Aunque el cliente ponga más gente de IT, casi siempre hay **stakeholders de negocio** —los que deciden, validan y firman— que no comparten el mismo nivel de compromiso ni de dedicación al proyecto. Son personas con su propio trabajo, sus prioridades y sus tiempos. No se les puede «escalar» como al equipo del implementador. Por eso el camino crítico del cliente no cede solo con buena voluntad: mover esas puertas exige un **compromiso explícito** de la otra parte (ver Quantum Leap).
 
 ## El rol del integrador: conduce la IA y trabaja las puertas
 
@@ -62,13 +74,24 @@ La IA no opera sola. En cada chunk hay una **persona al mando —el integrador�
 - **Dentro de la caja** — el integrador **conduce la IA y la supervisa en cada paso**. La IA acelera el trabajo interno, pero no decide sola: alguien la dirige, revisa lo que produce y responde por el resultado. Sin ese conductor, no hay trabajo verde comprimido; hay output sin control.
 - **En las puertas** — su trabajo más crítico es **ayudar al cliente a abrir la puerta de entrada y cerrar la de salida, a tiempo**. Las puertas las abre el cliente, pero el integrador es quien las provoca: prepara el artefacto listo para decidir, persigue el input que falta, reduce la latencia de cada dependencia. Quien mueve el proyecto hacia adelante es el humano, no la IA.
 
+El perfil que mejor trabaja las puertas es el de **business analyst / business architect**. Cuando la caja se encoge, el cuello de botella se desplaza del *construir* al *decidir con el cliente*: entender el negocio, preparar la decisión, traducir entre lo técnico y lo que el cliente necesita aprobar. Ese es exactamente el músculo del business architect. Ir más rápido no es solo producir más rápido; es **hacer que el cliente decida más rápido** — y eso pide potenciar el perfil que habla el idioma del negocio, no solo el que configura la plataforma.
+
 Por eso, aunque la IA encoja las cajas, **el camino crítico lo trabaja una persona**: la IA no abre puertas ni se conduce sola.
+
+### La caja encoge, la gobernanza crece
+
+Hay una trampa contraintuitiva: cuando el trabajo interno se comprime, la reacción natural es «hace falta menos supervisión». Es al revés. **Cuanto más pequeña es la caja, más crítica es la gobernanza humana**, por dos razones:
+
+- **La IA produce más, más rápido y con más autonomía** — más output por unidad de tiempo es más superficie que revisar, no menos. Un error se propaga a la velocidad de la máquina.
+- **La velocidad solo es real si trae la calidad dentro** — el trabajo «hecho en 3 días» solo cuenta como equivalente al de 3 semanas si incluye la revisión técnica, las pruebas end-to-end y el control de calidad que antes también se hacían. Comprimir el trabajo **sin** comprometer esa revisión es precisamente el rol del integrador.
+
+La gobernanza no es un freno a la aceleración: es la condición para que la aceleración sea creíble. A management se le vende «más rápido», pero lo que hace que ese «más rápido» no sea trabajo a medias es una capa de supervisión que **crece** con la autonomía de la IA.
 
 ## El giro de la tesis: la IA encoge las cajas, no mueve las puertas
 
 Con esta anatomía, la tesis se vuelve geométrica:
 
-> La IA **encoge las cajas** (el trabajo interno). Las **puertas entre cajas no se mueven**. Si encoges las cajas 10x, el proyecto pasa a estar hecho, sobre todo, de **puertas**.
+> La IA **encoge las cajas** (el trabajo interno). Las **puertas entre cajas no se mueven**. Aunque encojas las cajas tanto como sueña la industria —el famoso «10x»—, el proyecto pasa a estar hecho, sobre todo, de **puertas**.
 
 El camino crítico es la suma de *puertas + trabajo*. Cuando el trabajo se vuelve pequeño, **las puertas dominan** el plazo total. Acelerar el trabajo interno (que casi siempre es verde) no comprime un proyecto cuyo tiempo vive ya en las puertas del cliente.
 
@@ -76,11 +99,13 @@ El camino crítico es la suma de *puertas + trabajo*. Cuando el trabajo se vuelv
 
 La IA reduce la duración del trabajo *dentro* de un chunk en el lado del implementador. Ejemplo:
 
-> Un sprint clásico tomaba **3 semanas**. Con IA, el mismo trabajo toma **3 días**.
+> Un sprint que tomaba **unas 3 semanas** puede bajar a **poco más de una semana** —una compresión de un puñado de veces, no el «10x» de folleto.
 
-Pero el chunk está limitado por el cliente en sus fronteras. El cliente que antes daba feedback, tenía reuniones y verbalizaba requerimientos **cada 3 semanas** no está garantizado que pueda hacerlo **cada 3 días**.
+> **Los factores concretos son ilustrativos, no un benchmark.** Y solo cuentan como reales si incluyen lo que antes también se hacía: revisión técnica, pruebas end-to-end y control de calidad. Un trabajo «hecho en 3 días» que no se ha revisado no es el mismo trabajo que el de 3 semanas —es trabajo a medias. La velocidad honesta es la que ya trae la calidad dentro.
 
-Si el implementador va 10x más rápido pero el cliente no reduce sus tiempos de respuesta en la misma proporción, el proyecto **no se comprime 10x**. Se comprime solo hasta donde el cliente permite.
+Pero el chunk está limitado por el cliente en sus fronteras. El cliente que antes daba feedback, tenía reuniones y verbalizaba requerimientos **cada 3 semanas** no está garantizado que pueda hacerlo **cada semana**.
+
+Si el implementador va mucho más rápido pero el cliente no reduce sus tiempos de respuesta en la misma proporción, el proyecto **no se comprime en esa proporción**. Se comprime solo hasta donde el cliente permite.
 
 ## Corolario: reducir equipo o es imposible
 
@@ -93,13 +118,15 @@ La aceleración por IA no elimina el camino crítico del cliente. Solo cambia qu
 
 ## Implicaciones
 
-- El "10x" es real **dentro** de los chunks del implementador, no **a nivel de proyecto**.
+- La compresión grande es real **dentro** de los chunks del implementador, no **a nivel de proyecto**. El «10x» es la aspiración de la industria; el factor real varía por chunk y suele ser de unas pocas veces, no de un orden de magnitud.
 - Dimensionar el proyecto por la velocidad del implementador (y no por el ritmo del cliente) lleva a sobredimensionar el equipo y a expectativas irreales de plazo.
 - La palanca real de gestión no es "más velocidad", sino **ajustar el equipo al ritmo de las dependencias del cliente**.
 
-## Dos palancas de aceleración: AI Fluency y AI Solutions
+## Dos palancas de aceleración: AI Fluency y AI Assets
 
 La teoría nombra **dos palancas** distintas con las que la IA encoge el trabajo interno de un chunk. Son **independientes**: un chunk puede acelerarse con una, con la otra, o con ambas.
+
+> **Nota de terminología.** A lo largo de la teoría, **AI Assets** es el nombre único de esta palanca. En material antiguo puede aparecer como «AI Solutions»: es el **mismo concepto** —soluciones IA empaquetadas y reutilizables— y se ha unificado en **AI Assets**.
 
 ### AI Fluency
 
@@ -109,9 +136,9 @@ La teoría nombra **dos palancas** distintas con las que la IA encoge el trabajo
 - **Ejemplos** — ya nadie toma notas: se transcribe y se automatiza. Ante un problema donde una IA básica ayuda, saber reconocerlo, aplicarla y manejarse mínimamente.
 - Es una **alfabetización base**, no un producto.
 
-### AI Solutions
+### AI Assets
 
-- **Qué es** — soluciones **completas** que aceleran un chunk de punta a punta, creadas con IA y que a su vez pueden usar IA. A todos los efectos, **assets basados en IA**.
+- **Qué es** — soluciones **completas** que aceleran un chunk de punta a punta, creadas con IA y que a su vez pueden usar IA. A todos los efectos, **assets basados en IA** (de ahí el nombre).
 - **Nivel** — un escalón de abstracción **por encima** de la fluency. Empaquetadas.
 - **Qué cuenta** — cualquier solución IA end-to-end que resuelva el chunk: propia o de terceros, genérica o vertical.
 - **Ejemplos (stack actual)** — Setup Agents / AI Driven Framework (CDF-native: extracción de epics, field mapping, sizing, generación de tech enablers), Slackbot (guías técnicas, riesgos y modelos de datos en una sesión), LucidAI (Story Maps visuales dentro de Lucidchart), **OAT (Org Assessment Tool)** — herramienta creada por Servicios Profesionales de Iberia que analiza el estado, la customización y la configuración de una org del cliente; reduce un trabajo de muchas semanas a días.
@@ -122,13 +149,13 @@ Son **dos palancas independientes**. Cada una acelera el chunk por su cuenta; no
 
 ### Efecto sobre el modelo de puertas
 
-El efecto **principal** de ambas palancas es **encoger la caja** (el trabajo interno). Pero, de forma **secundaria, ambas pueden reducir la fricción de las puertas**: no *abren* la puerta —eso solo lo hace el cliente— pero pueden hacer que el cliente la abra **antes**. Un integrador con fluency prepara un artefacto claro y listo para decidir, y la aprobación tarda un día en vez de una semana; un AI Solution pre-estructura lo que el cliente debe entregar, y el input llega más limpio y más rápido.
+El efecto **principal** de ambas palancas es **encoger la caja** (el trabajo interno). Pero, de forma **secundaria, ambas pueden reducir la fricción de las puertas**: no *abren* la puerta —eso solo lo hace el cliente— pero pueden hacer que el cliente la abra **antes**. Un integrador con fluency prepara un artefacto claro y listo para decidir, y la aprobación tarda un día en vez de una semana; un AI Asset pre-estructura lo que el cliente debe entregar, y el input llega más limpio y más rápido.
 
 La puerta sigue siendo del cliente y sigue en el camino crítico. La buena práctica solo **recorta su latencia**, no la elimina.
 
 ## Cómo los arquitectos dominan la IA: Fluency vs Assets
 
-Las dos palancas exigen dos cosas distintas de las personas. Un arquitecto de Salesforce debe **dominar la AI Fluency** y **conocer los AI Assets** (las AI Solutions). No son el mismo esfuerzo ni se adquieren igual.
+Las dos palancas exigen dos cosas distintas de las personas. Un arquitecto de Salesforce debe **dominar la AI Fluency** y **conocer los AI Assets**. No son el mismo esfuerzo ni se adquieren igual.
 
 - **Dominar la Fluency** — es una habilidad interna, como aprender a usar Excel hace veinte años. No se compra; se entrena.
 - **Conocer los Assets** — es saber qué soluciones existen, qué chunk resuelve cada una y cuándo tirar de ellas (SEAP, LucidAI, OAT, Setup Agents…). No hay que reconstruirlas: hay que saber usarlas.
@@ -195,10 +222,10 @@ Lo que revela la tabla: **casi todo el trabajo interno es verde** — la IA lo a
 
 El modelo de puertas separa dos ejes de acción que la industria confunde: **encoger las cajas** (lado oferta, del integrador) y **mover las puertas** (lado cliente, el único que toca el camino crítico). Dos iniciativas de Salesforce se colocan, cada una, en un eje distinto.
 
-### SEAP — el AI Solution que aspira a cubrir todos los chunks
+### SEAP — el AI Asset que aspira a cubrir todos los chunks
 
 - **Qué es** — una **multitool** que llama al LLM haciéndole **adoptar roles** y guarda automáticamente en **memoria** lo que se va haciendo. Aspira a situarse **por encima de todos los project chunks** y resolver varios de golpe.
-- **Dónde encaja** — es un **AI Solution** (mismo eje que Setup Agents, Slackbot, LucidAI, OAT), solo que con **mayor alcance**: en vez de encoger una caja, intenta encoger **muchas cajas a la vez**.
+- **Dónde encaja** — es un **AI Asset** (mismo eje que Setup Agents, Slackbot, LucidAI, OAT), solo que con **mayor alcance**: en vez de encoger una caja, intenta encoger **muchas cajas a la vez**.
 - **Lo que la teoría dice de él** — SEAP **no cambia las puertas** ni el hecho de que **el cliente no puede ir más deprisa de lo que va**. Comprime el lado oferta a mayor escala; el camino crítico —que vive en las puertas del cliente— **queda intacto**. Sigue siendo, geométricamente, encoger cajas.
 
 ### Quantum Leap — el programa que sí mueve las puertas
@@ -226,7 +253,7 @@ Es decir: **AI Delivery cambia *qué* entregas (más o mejor), no *cuándo* lo e
 | Palanca | Eje | Qué toca | ¿Mueve el camino crítico? |
 |---|---|---|---|
 | AI Fluency | oferta | encoge la caja (gente) | No (recorta latencia de puerta, no la mueve) |
-| AI Solutions | oferta | encoge la caja (assets) | No (íd.) |
+| AI Assets | oferta | encoge la caja (assets) | No (íd.) |
 | **SEAP** | oferta | encoge **muchas cajas** a la vez | **No** |
 | **AI Delivery** | oferta | encoge cajas, puertas quietas → **más scope o más calidad** | **No** (default sin Quantum Leap) |
 | **Quantum Leap** | **cliente + oferta** | **mueve las puertas** (por contrato) + encoge cajas | **Sí** — único |

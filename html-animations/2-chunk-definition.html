@@ -19,7 +19,7 @@
   body{
     background:var(--paper);
     color:var(--ink);
-    font-family:"Comic Sans MS","Chalkboard SE","Comic Neue","Segoe Print","Bradley Hand",cursive,sans-serif;
+    font-family:"Comic Neue","Chalkboard SE","Segoe Print","Bradley Hand","Comic Sans MS",cursive,sans-serif;
     overflow:hidden;
     display:flex;flex-direction:column;
     /* faint paper grid */
@@ -231,7 +231,7 @@
   </section>
 
   <!-- 4 · BOTH GATES OPENED BY THE CLIENT -->
-  <section class="scene" data-dur="6800" data-sub="Both gates are opened by the client — never by the AI.">
+  <section class="scene" data-dur="6800" data-sub="Both gates are opened by the client. The integrator and the AI don't turn the key — but they can cut how long the client takes to turn it.">
     <svg class="board" viewBox="0 0 1000 620">
       <g filter="url(#sketch)">
         <!-- the box with gates -->
@@ -249,13 +249,13 @@
         <!-- keys at gates -->
         <text class="t-m fade" data-delay="3000" x="330" y="210">🔑</text>
         <text class="t-m fade" data-delay="3200" x="628" y="210">🔑</text>
-        <text class="t-s center tx-muted fade" data-delay="3700" x="500" y="500">the AI does not open gates</text>
+        <text class="t-s center tx-muted fade" data-delay="3700" x="500" y="500">the client turns the key — others cut the wait</text>
       </g>
     </svg>
   </section>
 
   <!-- 5 · AI WORKS ONLY INSIDE -->
-  <section class="scene" data-dur="6600" data-sub="The AI works only inside the box — it accelerates the internal work.">
+  <section class="scene" data-dur="6600" data-sub="The AI works only inside the box — it accelerates the internal work by a large factor.">
     <svg class="board" viewBox="0 0 1000 620">
       <g filter="url(#sketch)">
         <path class="ink draw fat" data-delay="150" data-dur="700" d="M320 220 L680 220 L680 430 L320 430 Z"/>
@@ -272,7 +272,7 @@
         <!-- work sparkles -->
         <path class="ink amber draw thin" data-delay="2400" data-dur="250" d="M400 270 l10 -18 l10 18 l-20 0 M405 300 l14 0 M405 310 l14 0"/>
         <path class="ink amber draw thin" data-delay="2600" data-dur="250" d="M580 270 l10 -18 l10 18 l-20 0 M585 300 l14 0 M585 310 l14 0"/>
-        <text class="t-s center tx-blue fade" data-delay="3000" x="500" y="470">work compresses — 10×</text>
+        <text class="t-s center tx-blue fade" data-delay="3000" x="500" y="470">work compresses a lot</text>
       </g>
     </svg>
   </section>
@@ -285,7 +285,7 @@
         <g><rect class="pop" data-delay="200" x="120" y="220" width="330" height="160" rx="14" fill="#e9f6ee" stroke="#3aa856" stroke-width="5"/>
            <text class="t-h center tx-green fade" data-delay="500" x="285" y="285">GREEN</text>
            <text class="t-s center tx-muted fade" data-delay="800" x="285" y="330">integrator + AI</text>
-           <text class="t-s center tx-muted fade" data-delay="950" x="285" y="362">10× faster</text></g>
+           <text class="t-s center tx-muted fade" data-delay="950" x="285" y="362">much faster</text></g>
         <!-- red box -->
         <g><rect class="pop" data-delay="1600" x="550" y="220" width="330" height="160" rx="14" fill="#fdeee9" stroke="#e8503a" stroke-width="5"/>
            <text class="t-h center tx-coral fade" data-delay="1900" x="715" y="285">RED</text>
@@ -297,7 +297,7 @@
   </section>
 
   <!-- 6b · TWO LEVERS -->
-  <section class="scene" data-dur="6800" data-sub="Two independent levers shrink the box: AI Fluency and AI Solutions.">
+  <section class="scene" data-dur="6800" data-sub="Two independent levers shrink the box: AI Fluency and AI Assets.">
     <svg class="board" viewBox="0 0 1000 620">
       <g filter="url(#sketch)">
         <text class="t-h center fade" data-delay="150" x="500" y="110">two levers</text>
@@ -308,7 +308,7 @@
            <text class="t-s center tx-muted fade" data-delay="1450" x="280" y="366">"like Excel"</text></g>
         <!-- solutions card -->
         <g><rect class="pop" data-delay="2100" x="540" y="200" width="360" height="230" rx="18" fill="#e9f6ee" stroke="#3aa856" stroke-width="5"/>
-           <text class="t-h center tx-green fade" data-delay="2400" x="720" y="280">AI Solutions</text>
+           <text class="t-h center tx-green fade" data-delay="2400" x="720" y="280">AI Assets</text>
            <text class="t-s center tx-muted fade" data-delay="2700" x="720" y="330">complete AI-built</text>
            <text class="t-s center tx-muted fade" data-delay="2850" x="720" y="366">assets, end-to-end</text></g>
         <text class="t-s center tx-muted fade" data-delay="3600" x="500" y="480">independent — use one, the other, or both</text>
@@ -346,11 +346,11 @@
     </svg>
   </section>
 
-  <!-- 6d · AI SOLUTIONS -->
-  <section class="scene" data-dur="7000" data-sub="AI Solutions: complete assets, one level above — built with AI, and using AI inside.">
+  <!-- 6d · AI ASSETS -->
+  <section class="scene" data-dur="7000" data-sub="AI Assets: complete solutions, one level above — built with AI, and using AI inside.">
     <svg class="board" viewBox="0 0 1000 620">
       <g filter="url(#sketch)">
-        <text class="t-h center tx-green fade" data-delay="150" x="500" y="110">AI Solutions</text>
+        <text class="t-h center tx-green fade" data-delay="150" x="500" y="110">AI Assets</text>
         <!-- a packaged box / asset with gears -->
         <path class="ink green draw fat" data-delay="500" data-dur="800" d="M370 200 L630 200 L630 380 L370 380 Z"/>
         <text class="t-s center tx-green fade" data-delay="1200" x="500" y="250">AI asset</text>
@@ -419,17 +419,17 @@
   </section>
 
   <!-- 6g · EXAMPLE 3 · BUILD -->
-  <section class="scene" data-dur="7000" data-sub="Example: build and configuration. Cursor and Claude Code turn a three-week sprint into three days.">
+  <section class="scene" data-dur="7000" data-sub="Example: build and configuration. Cursor and Claude Code turn a three-week sprint into a little over a week — review and tests included.">
     <svg class="board" viewBox="0 0 1000 620">
       <g filter="url(#sketch)">
         <text class="t-s center tx-muted fade" data-delay="150" x="500" y="80">chunk example</text>
         <text class="t-h center tx-green fade" data-delay="400" x="500" y="140">Build / config</text>
         <text class="t-s tx-muted fade" data-delay="900" x="150" y="220">before</text>
         <path class="ink muted draw" data-delay="1100" data-dur="900" d="M150 238 L690 238 L690 296 L150 296 Z"/>
-        <text class="t-m center tx-muted fade" data-delay="1900" x="420" y="276">3 weeks</text>
+        <text class="t-m center tx-muted fade" data-delay="1900" x="420" y="276">~3 weeks</text>
         <text class="t-s tx-green fade" data-delay="2400" x="150" y="360">with AI</text>
-        <path class="ink green draw fat" data-delay="2600" data-dur="500" d="M150 378 L270 378 L270 436 L150 436 Z"/>
-        <text class="t-m tx-green fade" data-delay="3100" x="290" y="416">3 days</text>
+        <path class="ink green draw fat" data-delay="2600" data-dur="500" d="M150 378 L320 378 L320 436 L150 436 Z"/>
+        <text class="t-m tx-green fade" data-delay="3100" x="340" y="416">~1 week</text>
         <g><rect class="pop" data-delay="3600" x="250" y="482" width="500" height="52" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
            <text class="t-s center tx-green fade" data-delay="3750" x="500" y="515">Cursor · Claude Code</text></g>
       </g>
@@ -509,7 +509,7 @@
   </section>
 
   <!-- 9 · PROJECT BECOMES MOSTLY GATES -->
-  <section class="scene" data-dur="7400" data-sub="Shrink every box tenfold and the project becomes, mostly, gates.">
+  <section class="scene" data-dur="7400" data-sub="Shrink every box as much as the industry dreams — even tenfold — and the project becomes, mostly, gates.">
     <svg class="board" viewBox="0 0 1000 620">
       <g filter="url(#sketch)">
         <!-- top: before — big boxes, few gates -->
@@ -647,6 +647,25 @@
     </svg>
   </section>
 
+  <!-- 14b · SMALLER BOX, MORE GOVERNANCE -->
+  <section class="scene" data-dur="7800" data-sub="And here is the twist: the smaller the box, the more governance it needs — the AI produces more, faster, so there is more to review, not less.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center fade" data-delay="150" x="500" y="110">smaller box,</text>
+        <text class="t-h center tx-coral fade" data-delay="500" x="500" y="168">more governance</text>
+        <!-- tiny work box -->
+        <path class="ink green draw fat" data-delay="1000" data-dur="500" d="M440 250 L560 250 L560 320 L440 320 Z"/>
+        <text class="t-s center tx-green fade" data-delay="1500" x="500" y="292">work</text>
+        <!-- big supervision eye/shield growing over it -->
+        <path class="ink coral draw fill-none fat" data-delay="1900" data-dur="700" d="M500 190 C360 250 360 250 500 400 C640 250 640 250 500 190 Z"/>
+        <circle class="ink coral draw fill-none" data-delay="2700" data-dur="400" cx="500" cy="300" r="30"/>
+        <circle class="pop" data-delay="3100" cx="500" cy="300" r="10" fill="#e8503a"/>
+        <text class="t-s center tx-coral fade" data-delay="3500" x="500" y="452">review · tests · quality</text>
+        <text class="t-s center tx-muted fade" data-delay="4100" x="500" y="500">speed only counts if quality rides inside</text>
+      </g>
+    </svg>
+  </section>
+
   <!-- 15 · THE INTEGRATOR WORKS THE GATES -->
   <section class="scene" data-dur="8000" data-sub="But the integrator's most critical job is at the gates: helping the client open the entry gate and close the exit gate, on time. The human moves the project forward, not the AI.">
     <svg class="board" viewBox="0 0 1000 620">
@@ -696,7 +715,7 @@
   <button id="next" title="Next (→)">▶</button>
   <button id="replay" title="Replay (R)">↻ replay</button>
   <button id="mute" title="Mute / Unmute (M)">🔊</button>
-  <span id="counter">1 / 23</span>
+  <span id="counter">1 / 24</span>
   <span class="hint">space=play/pause · ←/→=scene · M=mute · R=replay</span>
 </div>
 
@@ -761,7 +780,7 @@
         if (i >= clauses.length){ speechDone = true; return; }
         const u = new SpeechSynthesisUtterance(clauses[i++]);
         if (voice) u.voice = voice;
-        u.rate = 0.98; u.pitch = 1.0; u.lang = voice ? voice.lang : 'en-US';
+        u.rate = 1.12; u.pitch = 1.0; u.lang = voice ? voice.lang : 'en-US';
         u.onend   = ()=>{ if (gen === speakGen) sayNext(); };
         u.onerror = ()=>{ if (gen === speakGen) sayNext(); }; // skip broken clause, keep going
         synth.speak(u);

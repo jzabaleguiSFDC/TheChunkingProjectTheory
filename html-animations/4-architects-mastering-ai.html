@@ -19,7 +19,7 @@
   body{
     background:var(--paper);
     color:var(--ink);
-    font-family:"Comic Sans MS","Chalkboard SE","Comic Neue","Segoe Print","Bradley Hand",cursive,sans-serif;
+    font-family:"Comic Neue","Chalkboard SE","Segoe Print","Bradley Hand","Comic Sans MS",cursive,sans-serif;
     overflow:hidden;
     display:flex;flex-direction:column;
     /* faint paper grid */
@@ -514,7 +514,7 @@
         if (i >= clauses.length){ speechDone = true; return; }
         const u = new SpeechSynthesisUtterance(clauses[i++]);
         if (voice) u.voice = voice;
-        u.rate = 0.98; u.pitch = 1.0; u.lang = voice ? voice.lang : 'en-US';
+        u.rate = 1.12; u.pitch = 1.0; u.lang = voice ? voice.lang : 'en-US';
         u.onend   = ()=>{ if (gen === speakGen) sayNext(); };
         u.onerror = ()=>{ if (gen === speakGen) sayNext(); }; // skip broken clause, keep going
         synth.speak(u);

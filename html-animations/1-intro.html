@@ -19,7 +19,7 @@
   body{
     background:var(--paper);
     color:var(--ink);
-    font-family:"Comic Sans MS","Chalkboard SE","Comic Neue","Segoe Print","Bradley Hand",cursive,sans-serif;
+    font-family:"Comic Neue","Chalkboard SE","Segoe Print","Bradley Hand","Comic Sans MS",cursive,sans-serif;
     overflow:hidden;
     display:flex;flex-direction:column;
     /* faint paper grid */
@@ -282,7 +282,7 @@
         <path class="ink muted draw thin" data-delay="1900" data-dur="300" d="M300 340 L230 340"/>
         <g>
           <rect class="pop" data-delay="2200" x="700" y="270" width="196" height="60" rx="14" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
-          <text class="t-m center tx-blue fade" data-delay="2350" x="798" y="308">10× faster</text>
+          <text class="t-m center tx-blue fade" data-delay="2350" x="798" y="308">much faster</text>
         </g>
       </g>
     </svg>
@@ -460,23 +460,23 @@
   </section>
 
   <!-- 11 · SPRINT SHRINKS (implementer side) -->
-  <section class="scene" data-dur="5400" data-sub="A sprint that took 3 weeks now takes 3 days — on the implementer's side.">
+  <section class="scene" data-dur="5400" data-sub="A sprint that took about 3 weeks now takes a little over a week — on the implementer's side, review and testing included.">
     <svg class="board" viewBox="0 0 1000 620">
       <g filter="url(#sketch)">
         <text class="t-s center tx-muted fade" data-delay="100" x="500" y="130">implementer</text>
         <path class="ink blue draw" data-delay="300" data-dur="900" d="M120 220 L620 220 L620 300 L120 300 Z"/>
-        <text class="t-m center tx-blue fade" data-delay="900" x="370" y="272">3 WEEKS</text>
+        <text class="t-m center tx-blue fade" data-delay="900" x="370" y="272">~3 WEEKS</text>
         <path class="ink coral draw fat" data-delay="1500" data-dur="600" d="M400 360 L400 420"/>
         <path class="ink coral draw" data-delay="2000" data-dur="300" d="M400 420 L378 388"/>
         <path class="ink coral draw" data-delay="2100" data-dur="300" d="M400 420 L422 388"/>
         <path class="ink green draw" data-delay="2400" data-dur="700" d="M300 460 L500 460 L500 540 L300 540 Z"/>
-        <text class="t-m center tx-green fade" data-delay="3000" x="400" y="512">3 DAYS</text>
+        <text class="t-m center tx-green fade" data-delay="3000" x="400" y="512">~1 WEEK</text>
       </g>
     </svg>
   </section>
 
   <!-- 12 · CLIENT CAN'T MATCH (panicking client) -->
-  <section class="scene" data-dur="6400" data-sub="But the client may not give feedback every 3 days instead of every 3 weeks.">
+  <section class="scene" data-dur="6400" data-sub="But the client may not give feedback every week instead of every 3 weeks.">
     <svg class="board" viewBox="0 0 1000 620">
       <g filter="url(#sketch)">
         <text class="t-s center tx-muted fade" data-delay="100" x="330" y="90">the client</text>
@@ -662,7 +662,7 @@
         if (i >= clauses.length){ speechDone = true; return; }
         const u = new SpeechSynthesisUtterance(clauses[i++]);
         if (voice) u.voice = voice;
-        u.rate = 0.98; u.pitch = 1.0; u.lang = voice ? voice.lang : 'en-US';
+        u.rate = 1.12; u.pitch = 1.0; u.lang = voice ? voice.lang : 'en-US';
         u.onend   = ()=>{ if (gen === speakGen) sayNext(); };
         u.onerror = ()=>{ if (gen === speakGen) sayNext(); }; // skip broken clause, keep going
         synth.speak(u);
