@@ -29,9 +29,14 @@ The folder is currently empty. Expected layout as content lands:
 
 ## Previewing the deck
 
-The deck is a static file — open it directly, or serve the folder if a local URL is preferred:
+The decks are static files — open directly, or serve the folder if a local URL is preferred:
 
 ```bash
-open <deck>.html                 # macOS: open in default browser
+open intro.html                  # animation 1: introduces the theory
+open chunk-definition.html       # animation 2: anatomy of a chunk (gates + internal work)
 python3 -m http.server 8000      # then visit http://localhost:8000
 ```
+
+## Animations
+
+Each animation is a self-contained doodle-style HTML file sharing the same engine and look (SVG draw-on strokes, `#sketch` wobble filter, handwriting font, marker palette on paper). The engine: `.scene` sections with `data-dur` (ms) and `data-sub` (subtitle + Web Speech narration); per-element `data-delay`/`data-dur` drive `.draw` (stroke-dashoffset), `.pop` and `.fade` animations. A start gate unlocks browser audio on first click. Narration is third-person ("the theory"), never first-person. When copying the engine to a new animation, keep the `<script>`, filter, and CSS identical — only the `.scene` blocks change.

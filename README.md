@@ -7,14 +7,18 @@ A theory on why AI does **not** let project-implementation firms compress a 1-ye
 ## Contents
 
 - **`teoria-del-chunking.md`** — the theory, written out (source of truth).
-- **`animacion-doodle.html`** — a self-contained hand-drawn "doodle" animation explaining the theory, with narration (Web Speech API). Open it in a browser.
+- **`intro.html`** — self-contained hand-drawn "doodle" animation introducing the theory, with narration (Web Speech API).
+- **`chunk-definition.html`** — second animation: the anatomy of a chunk (entry gate → internal work → exit gate) and why AI shrinks the boxes but not the gates.
 
-## Viewing the animation
+Each `.html` opens in a browser — no build step, no server, no network.
 
-Open the file directly — no build step, no server, no network:
+## Viewing the animations
+
+Open a file directly:
 
 ```bash
-open animacion-doodle.html
+open intro.html
+open chunk-definition.html
 ```
 
 Click once to start (browsers require a gesture before playing audio).

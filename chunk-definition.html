@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Chunking Project Theory — Anatomy of a Chunk</title>
+<style>
+  :root{
+    --paper:#fbf7ec;
+    --ink:#2d2a26;
+    --coral:#e8503a;
+    --blue:#2f6fed;
+    --amber:#f2b01e;
+    --green:#3aa856;
+    --muted:#b9b2a2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Comic Sans MS","Chalkboard SE","Comic Neue","Segoe Print","Bradley Hand",cursive,sans-serif;
+    overflow:hidden;
+    display:flex;flex-direction:column;
+    /* faint paper grid */
+    background-image:
+      linear-gradient(rgba(45,42,38,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45,42,38,.035) 1px, transparent 1px);
+    background-size:26px 26px;
+  }
+  #stage{
+    position:relative;flex:1;min-height:0;
+    display:flex;align-items:center;justify-content:center;
+    padding-bottom:120px; /* reserve room for the caption band */
+  }
+  .scene{
+    position:absolute;inset:0 0 120px 0; /* keep drawings above the caption */
+    display:none;
+    align-items:center;justify-content:center;
+  }
+  .scene.active{display:flex}
+  svg.board{width:min(94vw,1180px);height:auto;max-height:72vh;overflow:visible}
+
+  /* draw-on effect handled via JS (stroke-dashoffset) */
+  .ink{fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+  .thin{stroke-width:3.5}
+  .fat{stroke-width:8}
+  .coral{stroke:var(--coral)}
+  .blue{stroke:var(--blue)}
+  .amber{stroke:var(--amber)}
+  .green{stroke:var(--green)}
+  .muted{stroke:var(--muted)}
+  .fill-none{fill:none}
+
+  text{font-family:inherit;fill:var(--ink)}
+  .t-title{font-size:76px;font-weight:700}
+  .t-big{font-size:120px;font-weight:700}
+  .t-h{font-size:44px;font-weight:700}
+  .t-m{font-size:30px}
+  .t-s{font-size:24px}
+  .tx-coral{fill:var(--coral)}
+  .tx-blue{fill:var(--blue)}
+  .tx-green{fill:var(--green)}
+  .tx-amber{fill:var(--amber)}
+  .tx-muted{fill:var(--muted)}
+  .center{text-anchor:middle}
+
+  /* pop-in for solid elements / text */
+  .pop{opacity:0;transform-box:fill-box;transform-origin:center}
+  .pop.go{animation:pop .55s cubic-bezier(.2,1.4,.4,1) both}
+  @keyframes pop{
+    0%{opacity:0;transform:scale(.4) rotate(-4deg)}
+    100%{opacity:1;transform:scale(1) rotate(0)}
+  }
+  .fade{opacity:0}
+  .fade.go{animation:fade .6s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  /* subtitle / caption bar */
+  #caption{
+    position:fixed;left:50%;bottom:84px;transform:translateX(-50%);
+    z-index:5;
+    max-width:min(90vw,1000px);
+    background:var(--ink);color:var(--paper);
+    padding:12px 26px;border-radius:14px;
+    font-size:clamp(17px,2.3vw,25px);line-height:1.3;text-align:center;
+    box-shadow:4px 5px 0 rgba(45,42,38,.25);
+    opacity:0;transition:opacity .3s ease, transform .3s ease;
+    pointer-events:none;
+  }
+  #caption.show{opacity:1}
+
+  /* controls */
+  #bar{position:relative;height:6px;background:rgba(45,42,38,.12)}
+  #fill{position:absolute;left:0;top:0;height:100%;width:0;background:var(--coral)}
+  #controls{
+    display:flex;align-items:center;gap:14px;justify-content:center;
+    padding:10px;font-size:14px;color:var(--ink);
+  }
+  #controls button{
+    font-family:inherit;font-size:16px;cursor:pointer;
+    background:var(--paper);color:var(--ink);
+    border:3px solid var(--ink);border-radius:10px;
+    padding:6px 14px;box-shadow:2px 3px 0 rgba(45,42,38,.25);
+    transition:transform .08s ease;
+  }
+  #controls button:hover{transform:translateY(-1px)}
+  #controls button:active{transform:translate(1px,2px);box-shadow:1px 1px 0 rgba(45,42,38,.25)}
+  #counter{min-width:70px;text-align:center;color:var(--muted)}
+  .hint{color:var(--muted);font-size:12px}
+
+  /* start gate overlay (unlocks browser audio on first click) */
+  #startgate{
+    position:fixed;inset:0;z-index:50;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(251,247,236,.94);
+    cursor:pointer;transition:opacity .4s ease;
+    background-image:
+      linear-gradient(rgba(45,42,38,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45,42,38,.04) 1px, transparent 1px);
+    background-size:26px 26px;
+  }
+  #startgate.hide{opacity:0;pointer-events:none}
+  .gatebox{text-align:center;transform:rotate(-1.2deg)}
+  .gateicon{font-size:72px;animation:bob 1.8s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .gatetitle{font-size:clamp(30px,5vw,54px);font-weight:700;color:var(--coral);margin:10px 0}
+  .gatehint{font-size:clamp(16px,2.4vw,24px);color:var(--ink);
+    border:3px solid var(--ink);border-radius:14px;padding:10px 22px;display:inline-block;
+    box-shadow:3px 4px 0 rgba(45,42,38,.2);background:#fff}
+</style>
+</head>
+<body>
+
+<!-- shared sketch/wobble filter -->
+<svg width="0" height="0" style="position:absolute">
+  <filter id="sketch" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2"/>
+  </filter>
+</svg>
+
+<div id="startgate">
+  <div class="gatebox">
+    <div class="gateicon">🚪</div>
+    <div class="gatetitle">Anatomy of a Chunk</div>
+    <div class="gatehint">Click anywhere to play with narration</div>
+  </div>
+</div>
+
+<div id="stage">
+
+  <!-- 1 · TITLE -->
+  <section class="scene" data-dur="4200" data-sub="Anatomy of a chunk.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-title center fade" data-delay="150" x="500" y="230">Anatomy of</text>
+        <text class="t-title center tx-coral fade" data-delay="450" x="500" y="320">a Chunk</text>
+        <!-- little chunk with two gates preview -->
+        <path class="ink draw" data-delay="1000" data-dur="700" d="M420 400 L580 400 L580 480 L420 480 Z"/>
+        <path class="ink green draw fat" data-delay="1600" data-dur="400" d="M420 400 L420 480"/>
+        <path class="ink coral draw fat" data-delay="1800" data-dur="400" d="M580 400 L580 480"/>
+        <text class="t-s center tx-muted fade" data-delay="2200" x="500" y="530">two gates, one job</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 2 · RECAP: project = chunks between dependencies -->
+  <section class="scene" data-dur="5600" data-sub="Recall: a project is a chain of chunks, split by dependencies on the client.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <path class="ink draw fat" data-delay="150" data-dur="1000" d="M80 320 L920 320"/>
+        <g><rect class="pop" data-delay="1100" x="110" y="292" width="150" height="56" rx="8" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
+           <text class="t-s center tx-blue fade" data-delay="1250" x="185" y="328">chunk</text></g>
+        <g><rect class="pop" data-delay="1450" x="300" y="292" width="150" height="56" rx="8" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="1600" x="375" y="328">chunk</text></g>
+        <g><rect class="pop" data-delay="1800" x="490" y="292" width="150" height="56" rx="8" fill="#fdf3d9" stroke="#f2b01e" stroke-width="4"/>
+           <text class="t-s center tx-amber fade" data-delay="1950" x="565" y="328">chunk</text></g>
+        <g><rect class="pop" data-delay="2150" x="680" y="292" width="150" height="56" rx="8" fill="#fdeee9" stroke="#e8503a" stroke-width="4"/>
+           <text class="t-s center tx-coral fade" data-delay="2300" x="755" y="328">chunk</text></g>
+        <!-- zoom pointer to one chunk -->
+        <path class="ink draw thin" data-delay="2700" data-dur="600" d="M375 360 L375 430"/>
+        <text class="t-s center tx-muted fade" data-delay="3300" x="375" y="470">let's zoom into one</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 3 · THREE PARTS -->
+  <section class="scene" data-dur="7200" data-sub="Every chunk has three parts: an entry gate, the internal work, and an exit gate.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <!-- the box -->
+        <path class="ink draw fat" data-delay="150" data-dur="1000" d="M330 220 L670 220 L670 420 L330 420 Z"/>
+        <text class="t-m center fade" data-delay="900" x="500" y="330">internal</text>
+        <text class="t-m center fade" data-delay="1050" x="500" y="368">work</text>
+        <!-- entry gate (left, green) -->
+        <path class="ink green draw fat" data-delay="1500" data-dur="500" d="M330 220 L330 420"/>
+        <text class="t-s center tx-green fade" data-delay="2000" x="250" y="200">ENTRY</text>
+        <text class="t-s center tx-green fade" data-delay="2100" x="250" y="230">gate</text>
+        <path class="ink green draw" data-delay="2300" data-dur="400" d="M250 300 L318 300"/>
+        <path class="ink green draw" data-delay="2600" data-dur="250" d="M318 300 L296 284"/>
+        <path class="ink green draw" data-delay="2700" data-dur="250" d="M318 300 L296 316"/>
+        <!-- exit gate (right, coral) -->
+        <path class="ink coral draw fat" data-delay="3200" data-dur="500" d="M670 220 L670 420"/>
+        <text class="t-s center tx-coral fade" data-delay="3700" x="760" y="200">EXIT</text>
+        <text class="t-s center tx-coral fade" data-delay="3800" x="760" y="230">gate</text>
+        <path class="ink coral draw" data-delay="4000" data-dur="400" d="M682 300 L750 300"/>
+        <path class="ink coral draw" data-delay="4300" data-dur="250" d="M750 300 L728 284"/>
+        <path class="ink coral draw" data-delay="4400" data-dur="250" d="M750 300 L728 316"/>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 4 · BOTH GATES OPENED BY THE CLIENT -->
+  <section class="scene" data-dur="6800" data-sub="Both gates are opened by the client — never by the AI.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <!-- the box with gates -->
+        <path class="ink draw fat" data-delay="150" data-dur="700" d="M360 240 L640 240 L640 420 L360 420 Z"/>
+        <path class="ink green draw fat" data-delay="800" data-dur="300" d="M360 240 L360 420"/>
+        <path class="ink coral draw fat" data-delay="1000" data-dur="300" d="M640 240 L640 420"/>
+        <text class="t-s center fade" data-delay="1200" x="500" y="340">work</text>
+        <!-- client stick figure center-top holding a key -->
+        <circle class="ink draw fill-none" data-delay="1500" data-dur="400" cx="500" cy="90" r="30"/>
+        <path class="ink draw" data-delay="1900" data-dur="300" d="M500 120 L500 180"/>
+        <text class="t-s center tx-muted fade" data-delay="2100" x="500" y="55">the client</text>
+        <!-- two arms reaching to each gate -->
+        <path class="ink draw" data-delay="2300" data-dur="500" d="M500 140 L380 220"/>
+        <path class="ink draw" data-delay="2500" data-dur="500" d="M500 140 L620 220"/>
+        <!-- keys at gates -->
+        <text class="t-m fade" data-delay="3000" x="330" y="210">🔑</text>
+        <text class="t-m fade" data-delay="3200" x="628" y="210">🔑</text>
+        <text class="t-s center tx-muted fade" data-delay="3700" x="500" y="500">the AI does not open gates</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 5 · AI WORKS ONLY INSIDE -->
+  <section class="scene" data-dur="6600" data-sub="The AI works only inside the box — it accelerates the internal work.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <path class="ink draw fat" data-delay="150" data-dur="700" d="M320 220 L680 220 L680 430 L320 430 Z"/>
+        <path class="ink green draw fat" data-delay="800" data-dur="250" d="M320 220 L320 430"/>
+        <path class="ink coral draw fat" data-delay="1000" data-dur="250" d="M680 220 L680 430"/>
+        <!-- little robot inside -->
+        <path class="ink blue draw" data-delay="1400" data-dur="300" d="M500 250 L500 232"/>
+        <circle class="pop" data-delay="1650" cx="500" cy="226" r="7" fill="#2f6fed" stroke="#2f6fed"/>
+        <path class="ink blue draw" data-delay="1450" data-dur="500" d="M460 258 L540 258 L540 318 L460 318 Z"/>
+        <circle class="pop" data-delay="1900" cx="482" cy="286" r="8" fill="#2f6fed"/>
+        <circle class="pop" data-delay="2000" cx="518" cy="286" r="8" fill="#2f6fed"/>
+        <path class="ink blue draw thin" data-delay="2100" data-dur="300" d="M480 302 Q500 312 520 302"/>
+        <path class="ink blue draw" data-delay="1900" data-dur="400" d="M460 330 L540 330 L548 396 L452 396 Z"/>
+        <!-- work sparkles -->
+        <path class="ink amber draw thin" data-delay="2400" data-dur="250" d="M400 270 l10 -18 l10 18 l-20 0 M405 300 l14 0 M405 310 l14 0"/>
+        <path class="ink amber draw thin" data-delay="2600" data-dur="250" d="M580 270 l10 -18 l10 18 l-20 0 M585 300 l14 0 M585 310 l14 0"/>
+        <text class="t-s center tx-blue fade" data-delay="3000" x="500" y="470">work compresses — 10×</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 6 · WORK HAS A COLOR -->
+  <section class="scene" data-dur="7000" data-sub="The internal work has a color: green when the integrator owns it, red when the client is inside it.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <!-- green box -->
+        <g><rect class="pop" data-delay="200" x="120" y="220" width="330" height="160" rx="14" fill="#e9f6ee" stroke="#3aa856" stroke-width="5"/>
+           <text class="t-h center tx-green fade" data-delay="500" x="285" y="295">GREEN</text>
+           <text class="t-s center tx-muted fade" data-delay="800" x="285" y="340">integrator + AI · 10×</text></g>
+        <!-- red box -->
+        <g><rect class="pop" data-delay="1600" x="550" y="220" width="330" height="160" rx="14" fill="#fdeee9" stroke="#e8503a" stroke-width="5"/>
+           <text class="t-h center tx-coral fade" data-delay="1900" x="715" y="295">RED</text>
+           <text class="t-s center tx-muted fade" data-delay="2200" x="715" y="340">client-bound · AI can't move it</text></g>
+        <text class="t-s center tx-muted fade" data-delay="3000" x="500" y="450">but the color is not the point…</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 7 · AI SHRINKS THE BOX -->
+  <section class="scene" data-dur="6800" data-sub="Here is the key move: the AI shrinks the box.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <!-- big box before -->
+        <path class="ink muted draw" data-delay="150" data-dur="800" d="M200 180 L640 180 L640 380 L200 380 Z"/>
+        <text class="t-s center tx-muted fade" data-delay="700" x="420" y="290">before</text>
+        <!-- arrow -->
+        <path class="ink coral draw fat" data-delay="1300" data-dur="500" d="M660 280 L740 280"/>
+        <path class="ink coral draw" data-delay="1800" data-dur="250" d="M740 280 L712 262"/>
+        <path class="ink coral draw" data-delay="1900" data-dur="250" d="M740 280 L712 298"/>
+        <!-- small box after -->
+        <path class="ink green draw fat" data-delay="2200" data-dur="700" d="M770 250 L850 250 L850 310 L770 310 Z"/>
+        <text class="t-s center tx-green fade" data-delay="2900" x="810" y="360">after</text>
+        <!-- squeeze arrows -->
+        <path class="ink muted draw thin" data-delay="3300" data-dur="250" d="M752 280 L768 280"/>
+        <path class="ink muted draw thin" data-delay="3400" data-dur="250" d="M868 280 L852 280"/>
+        <text class="t-m center tx-blue fade" data-delay="3800" x="500" y="470">the work gets small</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 8 · BUT THE GATES DON'T MOVE -->
+  <section class="scene" data-dur="7200" data-sub="But the gates don't move. The client still opens them at the same pace.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <!-- fixed gates (tall posts) -->
+        <path class="ink green draw fat" data-delay="150" data-dur="600" d="M300 140 L300 460"/>
+        <path class="ink coral draw fat" data-delay="450" data-dur="600" d="M700 140 L700 460"/>
+        <text class="t-s center tx-green fade" data-delay="900" x="300" y="120">entry</text>
+        <text class="t-s center tx-coral fade" data-delay="1000" x="700" y="120">exit</text>
+        <!-- tiny shrunk work between them -->
+        <path class="ink draw" data-delay="1500" data-dur="500" d="M460 280 L540 280 L540 340 L460 340 Z"/>
+        <text class="t-s center fade" data-delay="2000" x="500" y="318">work</text>
+        <!-- lots of empty gap = waiting -->
+        <path class="ink muted draw thin" data-delay="2400" data-dur="400" d="M310 500 L458 500"/>
+        <path class="ink muted draw thin" data-delay="2700" data-dur="400" d="M542 500 L690 500"/>
+        <text class="t-s center tx-muted fade" data-delay="3200" x="380" y="540">waiting</text>
+        <text class="t-s center tx-muted fade" data-delay="3400" x="620" y="540">waiting</text>
+        <text class="t-m center tx-coral fade" data-delay="4000" x="500" y="190">gates stay fixed</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 9 · PROJECT BECOMES MOSTLY GATES -->
+  <section class="scene" data-dur="7400" data-sub="Shrink every box tenfold and the project becomes, mostly, gates.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <!-- top: before — big boxes, few gates -->
+        <text class="t-s tx-muted fade" data-delay="150" x="90" y="180">before</text>
+        <path class="ink muted draw" data-delay="300" data-dur="500" d="M170 200 L360 200 L360 260 L170 260 Z"/>
+        <path class="ink muted draw" data-delay="600" data-dur="500" d="M400 200 L590 200 L590 260 L400 260 Z"/>
+        <path class="ink muted draw" data-delay="900" data-dur="500" d="M630 200 L820 200 L820 260 L630 260 Z"/>
+        <path class="ink coral draw thin" data-delay="1200" data-dur="150" d="M380 195 L380 265"/>
+        <path class="ink coral draw thin" data-delay="1300" data-dur="150" d="M610 195 L610 265"/>
+
+        <!-- bottom: after — tiny boxes, gates dominate -->
+        <text class="t-s tx-coral fade" data-delay="1800" x="90" y="400">after 10×</text>
+        <path class="ink coral draw fat" data-delay="2000" data-dur="200" d="M170 360 L170 470"/>
+        <path class="ink green draw" data-delay="2150" data-dur="200" d="M210 405 L250 405 L250 435 L210 435 Z"/>
+        <path class="ink coral draw fat" data-delay="2300" data-dur="200" d="M300 360 L300 470"/>
+        <path class="ink green draw" data-delay="2450" data-dur="200" d="M340 405 L380 405 L380 435 L340 435 Z"/>
+        <path class="ink coral draw fat" data-delay="2600" data-dur="200" d="M430 360 L430 470"/>
+        <path class="ink green draw" data-delay="2750" data-dur="200" d="M470 405 L510 405 L510 435 L470 435 Z"/>
+        <path class="ink coral draw fat" data-delay="2900" data-dur="200" d="M560 360 L560 470"/>
+        <path class="ink green draw" data-delay="3050" data-dur="200" d="M600 405 L640 405 L640 435 L600 435 Z"/>
+        <path class="ink coral draw fat" data-delay="3200" data-dur="200" d="M690 360 L690 470"/>
+        <path class="ink green draw" data-delay="3350" data-dur="200" d="M730 405 L770 405 L770 435 L730 435 Z"/>
+        <path class="ink coral draw fat" data-delay="3500" data-dur="200" d="M820 360 L820 470"/>
+        <text class="t-m center tx-coral fade" data-delay="4000" x="500" y="540">mostly gates now</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 10 · CRITICAL PATH LIVES IN THE GATES -->
+  <section class="scene" data-dur="6600" data-sub="So the critical path no longer lives in the work. It lives in the gates.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-m center fade" data-delay="200" x="500" y="200">critical path =</text>
+        <text class="t-h center tx-coral fade" data-delay="700" x="500" y="280">the gates</text>
+        <text class="t-s center tx-muted fade" data-delay="1300" x="500" y="330">not the work</text>
+        <!-- gates row -->
+        <path class="ink coral draw fat" data-delay="1800" data-dur="200" d="M300 380 L300 470"/>
+        <path class="ink coral draw fat" data-delay="1950" data-dur="200" d="M420 380 L420 470"/>
+        <path class="ink coral draw fat" data-delay="2100" data-dur="200" d="M540 380 L540 470"/>
+        <path class="ink coral draw fat" data-delay="2250" data-dur="200" d="M660 380 L660 470"/>
+        <path class="ink coral draw fat" data-delay="2400" data-dur="200" d="M700 380 L700 470"/>
+        <text class="t-s center tx-muted fade" data-delay="2900" x="500" y="520">each one opened by the client</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 11 · BLOCKED CHUNK -->
+  <section class="scene" data-dur="6800" data-sub="And when the entry gate stays shut, the chunk is blocked — the green work never even starts.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <!-- closed entry gate with lock -->
+        <path class="ink coral draw fat" data-delay="150" data-dur="600" d="M330 200 L330 440"/>
+        <path class="ink coral draw fat" data-delay="450" data-dur="400" d="M330 200 L360 200"/>
+        <!-- padlock -->
+        <path class="ink coral draw fill-none" data-delay="900" data-dur="500" d="M300 250 a30 30 0 0 1 60 0 l0 24 l-60 0 Z"/>
+        <rect class="pop" data-delay="1500" x="292" y="272" width="76" height="60" rx="8" fill="#fdeee9" stroke="#e8503a" stroke-width="5"/>
+        <circle class="pop" data-delay="1800" cx="330" cy="298" r="7" fill="#e8503a"/>
+        <path class="ink coral draw thin" data-delay="2000" data-dur="200" d="M330 305 L330 320"/>
+        <!-- green work waiting behind, greyed intent -->
+        <path class="ink green draw" data-delay="2400" data-dur="600" d="M430 240 L640 240 L640 400 L430 400 Z"/>
+        <text class="t-s center tx-green fade" data-delay="3000" x="535" y="312">green work</text>
+        <text class="t-s center tx-green fade" data-delay="3200" x="535" y="350">ready…</text>
+        <text class="t-m center tx-coral fade" data-delay="3800" x="500" y="480">…but the gate is shut</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 12 · BLOCK: API SPECS -->
+  <section class="scene" data-dur="6600" data-sub="Integrations wait on the client's API specifications.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center tx-coral fade" data-delay="150" x="500" y="130">INTEGRATIONS</text>
+        <!-- two systems, dashed link -->
+        <path class="ink blue draw" data-delay="500" data-dur="500" d="M180 260 L360 260 L360 380 L180 380 Z"/>
+        <text class="t-s center tx-blue fade" data-delay="1000" x="270" y="328">our system</text>
+        <path class="ink draw" data-delay="1300" data-dur="500" d="M640 260 L820 260 L820 380 L640 380 Z"/>
+        <text class="t-s center fade" data-delay="1800" x="730" y="328">3rd party</text>
+        <!-- broken/dashed connector -->
+        <path class="ink coral draw thin" data-delay="2200" data-dur="250" d="M370 320 L420 320"/>
+        <path class="ink coral draw thin" data-delay="2350" data-dur="250" d="M450 320 L500 320"/>
+        <text class="t-big tx-coral fade" data-delay="2600" x="500" y="345">?</text>
+        <path class="ink coral draw thin" data-delay="2800" data-dur="250" d="M540 320 L590 320"/>
+        <path class="ink coral draw thin" data-delay="2950" data-dur="250" d="M620 320 L640 320"/>
+        <text class="t-m center tx-coral fade" data-delay="3400" x="500" y="470">🔒 no API specs → blocked</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 13 · BLOCK: MIGRATION -->
+  <section class="scene" data-dur="6600" data-sub="Data migration waits on the client's clean data.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center tx-coral fade" data-delay="150" x="500" y="130">MIGRATION</text>
+        <!-- messy source db -->
+        <ellipse class="ink draw fill-none" data-delay="500" data-dur="400" cx="270" cy="240" rx="90" ry="30"/>
+        <path class="ink draw" data-delay="900" data-dur="500" d="M180 240 L180 360 a90 30 0 0 0 180 0 L360 240"/>
+        <path class="ink coral draw thin" data-delay="1400" data-dur="200" d="M230 300 L250 320 M250 300 L230 320"/>
+        <path class="ink coral draw thin" data-delay="1550" data-dur="200" d="M290 300 L310 320 M310 300 L290 320"/>
+        <text class="t-s center tx-coral fade" data-delay="1750" x="270" y="410">messy data</text>
+        <!-- arrow -->
+        <path class="ink coral draw fat" data-delay="2100" data-dur="500" d="M400 300 L560 300"/>
+        <path class="ink coral draw" data-delay="2600" data-dur="250" d="M560 300 L528 282"/>
+        <path class="ink coral draw" data-delay="2700" data-dur="250" d="M560 300 L528 318"/>
+        <!-- target db -->
+        <ellipse class="ink green draw fill-none" data-delay="3000" data-dur="400" cx="710" cy="240" rx="90" ry="30"/>
+        <path class="ink green draw" data-delay="3300" data-dur="500" d="M620 240 L620 360 a90 30 0 0 0 180 0 L800 240"/>
+        <text class="t-m center tx-coral fade" data-delay="3900" x="500" y="470">🔒 no clean data → blocked</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 14 · CLOSING -->
+  <section class="scene" data-dur="7600" data-sub="The AI shrinks the boxes. Only the client moves the gates.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-m center fade" data-delay="200" x="500" y="200">The AI shrinks the</text>
+        <text class="t-m center tx-blue fade" data-delay="600" x="500" y="252">boxes.</text>
+        <text class="t-m center fade" data-delay="1300" x="500" y="332">Only the client moves the</text>
+        <text class="t-m center tx-coral fade" data-delay="1700" x="500" y="384">gates.</text>
+        <path class="ink amber draw" data-delay="2300" data-dur="900"
+              d="M250 430 Q500 458 760 424 Q680 446 420 442 Q320 442 250 430"/>
+        <text class="t-s center tx-muted fade" data-delay="3100" x="500" y="530">— The Chunking Project Theory</text>
+      </g>
+    </svg>
+  </section>
+
+</div>
+
+<div id="caption"></div>
+<div id="bar"><div id="fill"></div></div>
+<div id="controls">
+  <button id="prev" title="Previous (←)">◀</button>
+  <button id="play" title="Play / Pause (space)">❚❚</button>
+  <button id="next" title="Next (→)">▶</button>
+  <button id="replay" title="Replay (R)">↻ replay</button>
+  <button id="mute" title="Mute / Unmute (M)">🔊</button>
+  <span id="counter">1 / 14</span>
+  <span class="hint">space=play/pause · ←/→=scene · M=mute · R=replay</span>
+</div>
+
+<script>
+(function(){
+  const scenes   = Array.from(document.querySelectorAll('.scene'));
+  const caption  = document.getElementById('caption');
+  const fill     = document.getElementById('fill');
+  const counter  = document.getElementById('counter');
+  const playBtn  = document.getElementById('play');
+  const muteBtn  = document.getElementById('mute');
+  const durs     = scenes.map(s => parseInt(s.dataset.dur,10) || 5000);
+  const total    = durs.reduce((a,b)=>a+b,0);
+  const cumBefore= durs.map((_,i)=> durs.slice(0,i).reduce((a,b)=>a+b,0));
+
+  let idx = 0;
+  let playing = true;
+  let sceneT0 = 0;        // performance.now() when current scene (re)started counting
+  let accrued = 0;        // ms already counted for current scene (across pauses)
+
+  /* ---- narration (Web Speech API, self-contained, no external audio) ---- */
+  const synth   = window.speechSynthesis;
+  const hasTTS  = !!synth;
+  let muted     = false;
+  let started   = false;   // browsers block audio until first user gesture
+  let speechDone= true;    // gates scene advance when audio is on
+  let voice     = null;
+  const LEAD_MS = 450;     // let the drawing begin before the voice starts
+
+  function pickVoice(){
+    if (!hasTTS) return;
+    const vs = synth.getVoices();
+    voice = vs.find(v => /en[-_]GB/i.test(v.lang) && /female|Google|Serena|Kate|Libby|Sonia/i.test(v.name))
+         || vs.find(v => /^en[-_]US/i.test(v.lang) && /Google|Samantha|Jenny|Aria/i.test(v.name))
+         || vs.find(v => /^en/i.test(v.lang))
+         || vs[0] || null;
+  }
+  if (hasTTS){
+    pickVoice();
+    synth.onvoiceschanged = pickVoice;
+  }
+
+  let leadTimer = null;
+  function speak(text){
+    if (!hasTTS || muted || !started){ speechDone = true; return; }
+    synth.cancel();
+    clearTimeout(leadTimer);
+    speechDone = false;
+    leadTimer = setTimeout(()=>{
+      if (muted || !playing){ speechDone = true; return; }
+      const u = new SpeechSynthesisUtterance(text);
+      if (voice) u.voice = voice;
+      u.rate = 0.98; u.pitch = 1.0; u.lang = voice ? voice.lang : 'en-US';
+      u.onend = ()=>{ speechDone = true; };
+      u.onerror = ()=>{ speechDone = true; };
+      synth.speak(u);
+    }, LEAD_MS);
+  }
+
+  function playAnims(scene){
+    // draw-on paths
+    scene.querySelectorAll('.draw').forEach(el=>{
+      let len = 300;
+      try { len = el.getTotalLength() || 300; } catch(e){}
+      const delay = parseFloat(el.dataset.delay || 0);
+      const dur   = parseFloat(el.dataset.dur   || 900);
+      el.style.transition = 'none';
+      el.style.strokeDasharray  = len;
+      el.style.strokeDashoffset = len;
+      el.getBoundingClientRect(); // reflow
+      el.style.transition = `stroke-dashoffset ${dur}ms cubic-bezier(.65,0,.35,1) ${delay}ms`;
+      el.style.strokeDashoffset = '0';
+    });
+    // pop / fade elements — restart CSS animation
+    scene.querySelectorAll('.pop, .fade').forEach(el=>{
+      el.classList.remove('go');
+      const delay = parseFloat(el.dataset.delay || 0);
+      el.style.animationDelay = delay + 'ms';
+      void el.offsetWidth; // reflow
+      el.classList.add('go');
+    });
+  }
+
+  function activate(i){
+    idx = (i + scenes.length) % scenes.length;
+    scenes.forEach((s,k)=> s.classList.toggle('active', k===idx));
+    const s = scenes[idx];
+    playAnims(s);
+    // caption
+    caption.textContent = s.dataset.sub || '';
+    caption.classList.remove('show');
+    void caption.offsetWidth;
+    caption.classList.add('show');
+    counter.textContent = (idx+1) + ' / ' + scenes.length;
+    accrued = 0;
+    sceneT0 = performance.now();
+    speak(s.dataset.sub || '');
+  }
+
+  function next(){ activate(idx+1); }
+  function prev(){ activate(idx-1); }
+
+  function setPlaying(p){
+    playing = p;
+    playBtn.textContent = p ? '❚❚' : '▶';
+    if (p){ sceneT0 = performance.now(); }
+    else if (hasTTS){ synth.cancel(); clearTimeout(leadTimer); }
+  }
+
+  function loop(now){
+    if (playing){
+      const elapsed = accrued + (now - sceneT0);
+      const shown = Math.min(elapsed, durs[idx]);
+      fill.style.width = ((cumBefore[idx] + shown) / total * 100) + '%';
+      // advance only when the timed duration passed AND the narration finished
+      const audioGate = (muted || !started) ? true : speechDone;
+      if (elapsed >= durs[idx] && audioGate){
+        if (idx === scenes.length - 1){
+          setPlaying(false);       // stop at the end
+          fill.style.width = '100%';
+        } else {
+          next();
+        }
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+
+  // controls
+  playBtn.addEventListener('click', ()=>{
+    if (playing){
+      accrued += performance.now() - sceneT0; // bank progress
+      setPlaying(false);
+    } else {
+      if (idx === scenes.length-1 && accrued >= durs[idx]) { activate(0); }
+      setPlaying(true);
+    }
+  });
+  document.getElementById('next').addEventListener('click', ()=>{ next(); setPlaying(true); });
+  document.getElementById('prev').addEventListener('click', ()=>{ prev(); setPlaying(true); });
+  document.getElementById('replay').addEventListener('click', ()=>{ activate(0); setPlaying(true); });
+
+  function setMuted(m){
+    muted = m;
+    muteBtn.textContent = m ? '🔇' : '🔊';
+    if (m && hasTTS){ synth.cancel(); clearTimeout(leadTimer); speechDone = true; }
+    else if (!m && playing){ speak(scenes[idx].dataset.sub || ''); } // start narrating current scene
+  }
+  muteBtn.addEventListener('click', ()=> setMuted(!muted));
+
+  // Start gate: browsers block speech until a user gesture.
+  // Hold on scene 1 until the user clicks, then begin with narration.
+  const gate = document.getElementById('startgate');
+  function beginShow(){
+    if (started) return;
+    started = true;
+    gate.classList.add('hide');
+    setTimeout(()=>gate.remove(), 500);
+    activate(0);            // restart scene 1 anims cleanly
+    setPlaying(true);
+    if (hasTTS && !muted) speak(scenes[0].dataset.sub || '');
+  }
+  gate.addEventListener('click', beginShow);
+
+  document.addEventListener('keydown', e=>{
+    if (!started){ beginShow(); return; }   // any key also starts the show
+    if (e.code === 'Space'){ e.preventDefault(); playBtn.click(); }
+    else if (e.code === 'ArrowRight'){ next(); setPlaying(true); }
+    else if (e.code === 'ArrowLeft'){ prev(); setPlaying(true); }
+    else if (e.key === 'r' || e.key === 'R'){ activate(0); setPlaying(true); }
+    else if (e.key === 'm' || e.key === 'M'){ setMuted(!muted); }
+  });
+
+  // prime scene 1 visuals behind the gate, but hold playback until user clicks
+  activate(0);
+  setPlaying(false);
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
