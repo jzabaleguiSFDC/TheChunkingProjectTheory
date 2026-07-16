@@ -140,9 +140,17 @@ Lo difícil no es querer, es **cómo**. El mercado ofrece capacidades **parecida
 1. **Conocer el jargon básico** — el vocabulario mínimo para operar (prompt, contexto, agente, modelo, memoria…).
 2. **Amoldar la mente** — sobre todo, adoptar la **nueva forma de pensar**. Esto es el verdadero músculo, y no se copia: se desarrolla.
 
+### El problema del ruido
+
+Hay un segundo obstáculo, más silencioso que el de los vendors: el **ruido**. Mucha gente está **ansiosa por compartir** sus logros, lo que ha aprendido, lo que usa. Bien intencionado, pero el volumen hace que los arquitectos **pierdan el foco de lo que de verdad importa**.
+
+- El ruido es **inevitable** — viene con la adopción masiva de IA, no se puede apagar.
+- **Distinguir la señal del ruido es, en sí mismo, parte de la AI Fluency.** El músculo no es solo saber usar la IA; es saber **a qué prestar atención** y qué ignorar.
+- Por eso las **AI Pills** son deliberadamente **señal, no ruido**: son iniciativas **validadas y curadas** (100% válidas), no un feed abierto de "mira lo que hice". Es la diferencia entre una vitamina y el zumbido de fondo.
+
 ### AI Pills: vitaminas para la Fluency
 
-En España el equipo fomenta la Fluency con **AI Pills**: pequeñas iniciativas que actúan como **vitaminas**. No quitan el esfuerzo —hay que dedicar tiempo, instalar, investigar— pero **ayudan a desarrollarlo**. Vienen de varias formas:
+En España el equipo fomenta la Fluency con **AI Pills**: pequeñas iniciativas **validadas** que actúan como **vitaminas** —señal curada frente al ruido de fondo. No quitan el esfuerzo —hay que dedicar tiempo, instalar, investigar— pero **ayudan a desarrollarlo**. Vienen de varias formas:
 
 1. **Compartir casos de uso (workflow de Slack)** — los arquitectos envían de qué forma innovadora, o que les haya ahorrado tiempo, han usado la IA, **y cómo reproducirlo**. Se comparte con el resto del equipo.
 2. **Sesiones de socialización (viernes)** — sesiones semanales exclusivas para compartir cómo la IA ha mejorado casos de uso reales.
