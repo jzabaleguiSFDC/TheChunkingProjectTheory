@@ -264,12 +264,14 @@
       <g filter="url(#sketch)">
         <!-- green box -->
         <g><rect class="pop" data-delay="200" x="120" y="220" width="330" height="160" rx="14" fill="#e9f6ee" stroke="#3aa856" stroke-width="5"/>
-           <text class="t-h center tx-green fade" data-delay="500" x="285" y="295">GREEN</text>
-           <text class="t-s center tx-muted fade" data-delay="800" x="285" y="340">integrator + AI · 10×</text></g>
+           <text class="t-h center tx-green fade" data-delay="500" x="285" y="285">GREEN</text>
+           <text class="t-s center tx-muted fade" data-delay="800" x="285" y="330">integrator + AI</text>
+           <text class="t-s center tx-muted fade" data-delay="950" x="285" y="362">10× faster</text></g>
         <!-- red box -->
         <g><rect class="pop" data-delay="1600" x="550" y="220" width="330" height="160" rx="14" fill="#fdeee9" stroke="#e8503a" stroke-width="5"/>
-           <text class="t-h center tx-coral fade" data-delay="1900" x="715" y="295">RED</text>
-           <text class="t-s center tx-muted fade" data-delay="2200" x="715" y="340">client-bound · AI can't move it</text></g>
+           <text class="t-h center tx-coral fade" data-delay="1900" x="715" y="285">RED</text>
+           <text class="t-s center tx-muted fade" data-delay="2200" x="715" y="330">client-bound</text>
+           <text class="t-s center tx-muted fade" data-delay="2350" x="715" y="362">AI can't move it</text></g>
         <text class="t-s center tx-muted fade" data-delay="3000" x="500" y="450">but the color is not the point…</text>
       </g>
     </svg>
@@ -340,34 +342,41 @@
         <path class="ink green draw thin" data-delay="2300" data-dur="300" d="M545 307 L545 319 M545 351 L545 363 M517 335 L529 335 M561 335 L573 335"/>
         <!-- little AI spark inside -->
         <text class="t-s center tx-amber fade" data-delay="2600" x="500" y="345">✨AI</text>
-        <!-- concrete solution chips -->
-        <g><rect class="pop" data-delay="3000" x="120" y="440" width="230" height="52" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
-           <text class="t-s center tx-green fade" data-delay="3150" x="235" y="474">Setup Agents (CDF)</text></g>
-        <g><rect class="pop" data-delay="3250" x="386" y="440" width="230" height="52" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
-           <text class="t-s center tx-green fade" data-delay="3400" x="501" y="474">Slackbot</text></g>
-        <g><rect class="pop" data-delay="3500" x="652" y="440" width="230" height="52" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
-           <text class="t-s center tx-green fade" data-delay="3650" x="767" y="474">LucidAI</text></g>
+        <!-- concrete solution chips · row 1 -->
+        <g><rect class="pop" data-delay="3000" x="140" y="410" width="200" height="50" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="3120" x="240" y="442">Setup Agents</text></g>
+        <g><rect class="pop" data-delay="3200" x="400" y="410" width="200" height="50" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="3320" x="500" y="442">Slackbot</text></g>
+        <g><rect class="pop" data-delay="3400" x="660" y="410" width="200" height="50" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="3520" x="760" y="442">LucidAI</text></g>
+        <!-- row 2 -->
+        <g><rect class="pop" data-delay="3650" x="140" y="478" width="430" height="50" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="3770" x="355" y="510">Org Assessment Tool (OAT)</text></g>
+        <g><rect class="pop" data-delay="3900" x="620" y="478" width="240" height="50" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="4020" x="740" y="510">SEAP</text></g>
       </g>
     </svg>
   </section>
 
   <!-- 6e · EXAMPLE 1 · EPIC SIZING -->
-  <section class="scene" data-dur="7000" data-sub="Example: epic extraction and sizing. Setup Agents on the CDF framework — two weeks of analysis becomes an afternoon.">
+  <section class="scene" data-dur="7000" data-sub="Example: epic extraction and sizing. Two weeks of analysis becomes an afternoon.">
     <svg class="board" viewBox="0 0 1000 620">
       <g filter="url(#sketch)">
-        <text class="t-s center tx-muted fade" data-delay="150" x="500" y="90">chunk example</text>
-        <text class="t-h center tx-green fade" data-delay="400" x="500" y="150">Epics + sizing</text>
-        <!-- before bar -->
-        <text class="t-s tx-muted fade" data-delay="900" x="120" y="250">before</text>
-        <path class="ink muted draw" data-delay="1100" data-dur="900" d="M120 270 L720 270 L720 330 L120 330 Z"/>
-        <text class="t-m center tx-muted fade" data-delay="1900" x="420" y="310">2 weeks</text>
-        <!-- after bar -->
-        <text class="t-s tx-green fade" data-delay="2400" x="120" y="410">with AI</text>
-        <path class="ink green draw fat" data-delay="2600" data-dur="500" d="M120 430 L240 430 L240 490 L120 490 Z"/>
-        <text class="t-m center tx-green fade" data-delay="3100" x="180" y="470">1 afternoon</text>
-        <!-- tool tag -->
-        <g><rect class="pop" data-delay="3600" x="360" y="420" width="380" height="60" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
-           <text class="t-s center tx-green fade" data-delay="3750" x="550" y="458">Setup Agents · CDF framework</text></g>
+        <text class="t-s center tx-muted fade" data-delay="150" x="500" y="80">chunk example</text>
+        <text class="t-h center tx-green fade" data-delay="400" x="500" y="140">Epics + sizing</text>
+        <!-- before bar (wide) -->
+        <text class="t-s tx-muted fade" data-delay="900" x="150" y="220">before</text>
+        <path class="ink muted draw" data-delay="1100" data-dur="900" d="M150 238 L690 238 L690 296 L150 296 Z"/>
+        <text class="t-m center tx-muted fade" data-delay="1900" x="420" y="276">2 weeks</text>
+        <!-- after bar (small) + duration beside it -->
+        <text class="t-s tx-green fade" data-delay="2400" x="150" y="360">with AI</text>
+        <path class="ink green draw fat" data-delay="2600" data-dur="500" d="M150 378 L270 378 L270 436 L150 436 Z"/>
+        <text class="t-m tx-green fade" data-delay="3100" x="290" y="416">1 afternoon</text>
+        <!-- tool tags (row below) -->
+        <g><rect class="pop" data-delay="3600" x="250" y="482" width="500" height="52" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="3720" x="500" y="515">Org Assessment Tool (OAT)</text></g>
+        <g><rect class="pop" data-delay="3900" x="250" y="546" width="500" height="52" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="4020" x="500" y="579">SEAP</text></g>
       </g>
     </svg>
   </section>
@@ -376,16 +385,16 @@
   <section class="scene" data-dur="7000" data-sub="Example: a visual story map. LucidAI generates it inside Lucidchart — days of drafting becomes one working session.">
     <svg class="board" viewBox="0 0 1000 620">
       <g filter="url(#sketch)">
-        <text class="t-s center tx-muted fade" data-delay="150" x="500" y="90">chunk example</text>
-        <text class="t-h center tx-green fade" data-delay="400" x="500" y="150">Story map</text>
-        <text class="t-s tx-muted fade" data-delay="900" x="120" y="250">before</text>
-        <path class="ink muted draw" data-delay="1100" data-dur="900" d="M120 270 L680 270 L680 330 L120 330 Z"/>
-        <text class="t-m center tx-muted fade" data-delay="1900" x="400" y="310">several days</text>
-        <text class="t-s tx-green fade" data-delay="2400" x="120" y="410">with AI</text>
-        <path class="ink green draw fat" data-delay="2600" data-dur="500" d="M120 430 L280 430 L280 490 L120 490 Z"/>
-        <text class="t-m center tx-green fade" data-delay="3100" x="200" y="470">1 session</text>
-        <g><rect class="pop" data-delay="3600" x="380" y="420" width="360" height="60" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
-           <text class="t-s center tx-green fade" data-delay="3750" x="560" y="458">LucidAI · in Lucidchart</text></g>
+        <text class="t-s center tx-muted fade" data-delay="150" x="500" y="80">chunk example</text>
+        <text class="t-h center tx-green fade" data-delay="400" x="500" y="140">Story map</text>
+        <text class="t-s tx-muted fade" data-delay="900" x="150" y="220">before</text>
+        <path class="ink muted draw" data-delay="1100" data-dur="900" d="M150 238 L690 238 L690 296 L150 296 Z"/>
+        <text class="t-m center tx-muted fade" data-delay="1900" x="420" y="276">several days</text>
+        <text class="t-s tx-green fade" data-delay="2400" x="150" y="360">with AI</text>
+        <path class="ink green draw fat" data-delay="2600" data-dur="500" d="M150 378 L290 378 L290 436 L150 436 Z"/>
+        <text class="t-m tx-green fade" data-delay="3100" x="310" y="416">1 session</text>
+        <g><rect class="pop" data-delay="3600" x="250" y="482" width="500" height="52" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="3750" x="500" y="515">LucidAI · in Lucidchart</text></g>
       </g>
     </svg>
   </section>
@@ -394,16 +403,16 @@
   <section class="scene" data-dur="7000" data-sub="Example: build and configuration. Cursor and Claude Code turn a three-week sprint into three days.">
     <svg class="board" viewBox="0 0 1000 620">
       <g filter="url(#sketch)">
-        <text class="t-s center tx-muted fade" data-delay="150" x="500" y="90">chunk example</text>
-        <text class="t-h center tx-green fade" data-delay="400" x="500" y="150">Build / config</text>
-        <text class="t-s tx-muted fade" data-delay="900" x="120" y="250">before</text>
-        <path class="ink muted draw" data-delay="1100" data-dur="900" d="M120 270 L700 270 L700 330 L120 330 Z"/>
-        <text class="t-m center tx-muted fade" data-delay="1900" x="410" y="310">3 weeks</text>
-        <text class="t-s tx-green fade" data-delay="2400" x="120" y="410">with AI</text>
-        <path class="ink green draw fat" data-delay="2600" data-dur="500" d="M120 430 L240 430 L240 490 L120 490 Z"/>
-        <text class="t-m center tx-green fade" data-delay="3100" x="180" y="470">3 days</text>
-        <g><rect class="pop" data-delay="3600" x="360" y="420" width="380" height="60" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
-           <text class="t-s center tx-green fade" data-delay="3750" x="550" y="458">Cursor · Claude Code</text></g>
+        <text class="t-s center tx-muted fade" data-delay="150" x="500" y="80">chunk example</text>
+        <text class="t-h center tx-green fade" data-delay="400" x="500" y="140">Build / config</text>
+        <text class="t-s tx-muted fade" data-delay="900" x="150" y="220">before</text>
+        <path class="ink muted draw" data-delay="1100" data-dur="900" d="M150 238 L690 238 L690 296 L150 296 Z"/>
+        <text class="t-m center tx-muted fade" data-delay="1900" x="420" y="276">3 weeks</text>
+        <text class="t-s tx-green fade" data-delay="2400" x="150" y="360">with AI</text>
+        <path class="ink green draw fat" data-delay="2600" data-dur="500" d="M150 378 L270 378 L270 436 L150 436 Z"/>
+        <text class="t-m tx-green fade" data-delay="3100" x="290" y="416">3 days</text>
+        <g><rect class="pop" data-delay="3600" x="250" y="482" width="500" height="52" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="3750" x="500" y="515">Cursor · Claude Code</text></g>
       </g>
     </svg>
   </section>
@@ -412,25 +421,26 @@
   <section class="scene" data-dur="7200" data-sub="Example: assessing a client org. OAT, built by Iberia Professional Services, turns many weeks into days.">
     <svg class="board" viewBox="0 0 1000 620">
       <g filter="url(#sketch)">
-        <text class="t-s center tx-muted fade" data-delay="150" x="500" y="80">chunk example</text>
-        <text class="t-h center tx-green fade" data-delay="400" x="500" y="140">Org assessment</text>
-        <!-- magnifier scanning an org (cloud + gears) -->
-        <path class="ink draw fill-none" data-delay="800" data-dur="700" d="M300 210 q-40 0 -40 34 q-40 2 -40 34 q0 30 40 30 l120 0 q40 0 40 -32 q0 -30 -36 -32 q-4 -36 -44 -36 q-20 0 -40 30"/>
-        <circle class="ink green draw fill-none" data-delay="1500" data-dur="400" cx="360" cy="250" r="14"/>
-        <path class="ink green draw thin" data-delay="1800" data-dur="200" d="M330 240 L322 236 M334 262 L326 268"/>
+        <text class="t-s center tx-muted fade" data-delay="150" x="500" y="70">chunk example</text>
+        <text class="t-h center tx-green fade" data-delay="400" x="500" y="128">Org assessment</text>
+        <!-- magnifier scanning an org (cloud + gear) -->
+        <path class="ink draw fill-none" data-delay="800" data-dur="700" d="M300 180 q-40 0 -40 34 q-40 2 -40 34 q0 30 40 30 l120 0 q40 0 40 -32 q0 -30 -36 -32 q-4 -36 -44 -36 q-20 0 -40 30"/>
+        <circle class="ink green draw fill-none" data-delay="1500" data-dur="400" cx="360" cy="220" r="14"/>
+        <path class="ink green draw thin" data-delay="1800" data-dur="200" d="M330 210 L322 206 M334 232 L326 238"/>
         <!-- magnifier -->
-        <circle class="ink coral draw fill-none fat" data-delay="2000" data-dur="500" cx="420" cy="280" r="40"/>
-        <path class="ink coral draw fat" data-delay="2500" data-dur="300" d="M450 310 L490 350"/>
-        <!-- before / after bars -->
-        <text class="t-s tx-muted fade" data-delay="2900" x="120" y="410">before</text>
-        <path class="ink muted draw" data-delay="3050" data-dur="900" d="M120 428 L720 428 L720 480 L120 480 Z"/>
-        <text class="t-m center tx-muted fade" data-delay="3800" x="420" y="466">many weeks</text>
-        <text class="t-s tx-green fade" data-delay="4000" x="120" y="540">with AI</text>
-        <path class="ink green draw fat" data-delay="4150" data-dur="450" d="M120 552 L230 552 L230 600 L120 600 Z"/>
-        <text class="t-s center tx-green fade" data-delay="4600" x="175" y="584">days</text>
-        <!-- tool tag -->
-        <g><rect class="pop" data-delay="4300" x="380" y="540" width="480" height="58" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
-           <text class="t-s center tx-green fade" data-delay="4450" x="620" y="576">OAT · Org Assessment Tool (Iberia PS)</text></g>
+        <circle class="ink coral draw fill-none fat" data-delay="2000" data-dur="500" cx="420" cy="250" r="40"/>
+        <path class="ink coral draw fat" data-delay="2500" data-dur="300" d="M450 280 L490 320"/>
+        <!-- before bar (wide) + after bar (small) -->
+        <text class="t-s tx-muted fade" data-delay="2900" x="150" y="360">before</text>
+        <path class="ink muted draw" data-delay="3050" data-dur="900" d="M150 378 L690 378 L690 430 L150 430 Z"/>
+        <text class="t-m center tx-muted fade" data-delay="3800" x="420" y="412">many weeks</text>
+        <text class="t-s tx-green fade" data-delay="4000" x="150" y="484">with AI</text>
+        <path class="ink green draw fat" data-delay="4150" data-dur="450" d="M150 500 L270 500 L270 548 L150 548 Z"/>
+        <text class="t-m tx-green fade" data-delay="4600" x="290" y="532">days</text>
+        <!-- tool tag (two lines) -->
+        <g><rect class="pop" data-delay="4300" x="470" y="484" width="440" height="86" rx="16" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="4450" x="690" y="522">OAT — Org Assessment Tool</text>
+           <text class="t-s center tx-green fade" data-delay="4450" x="690" y="552">(Iberia PS)</text></g>
       </g>
     </svg>
   </section>
@@ -592,17 +602,67 @@
     </svg>
   </section>
 
-  <!-- 14 · CLOSING -->
-  <section class="scene" data-dur="7600" data-sub="The AI shrinks the boxes. Only the client moves the gates.">
+  <!-- 14 · THE INTEGRATOR DRIVES THE AI -->
+  <section class="scene" data-dur="7600" data-sub="Inside every box there is a person in charge. The integrator drives the AI and supervises every step — the AI never runs on its own.">
     <svg class="board" viewBox="0 0 1000 620">
       <g filter="url(#sketch)">
-        <text class="t-m center fade" data-delay="200" x="500" y="200">The AI shrinks the</text>
-        <text class="t-m center tx-blue fade" data-delay="600" x="500" y="252">boxes.</text>
-        <text class="t-m center fade" data-delay="1300" x="500" y="332">Only the client moves the</text>
-        <text class="t-m center tx-coral fade" data-delay="1700" x="500" y="384">gates.</text>
-        <path class="ink amber draw" data-delay="2300" data-dur="900"
-              d="M250 430 Q500 458 760 424 Q680 446 420 442 Q320 442 250 430"/>
-        <text class="t-s center tx-muted fade" data-delay="3100" x="500" y="530">— The Chunking Project Theory</text>
+        <text class="t-s center tx-muted fade" data-delay="150" x="500" y="76">the critical human</text>
+        <text class="t-h center fade" data-delay="450" x="500" y="134">The integrator</text>
+        <!-- person (integrator) on the left -->
+        <circle class="ink draw fill-none" data-delay="1000" data-dur="400" cx="300" cy="230" r="28"/>
+        <path class="ink draw" data-delay="1400" data-dur="400" d="M300 258 L300 350"/>
+        <path class="ink draw" data-delay="1700" data-dur="300" d="M300 282 L258 322"/>
+        <path class="ink coral draw fat" data-delay="1900" data-dur="400" d="M300 282 L470 250"/>
+        <path class="ink draw" data-delay="2200" data-dur="300" d="M300 350 L275 410"/>
+        <path class="ink draw" data-delay="2350" data-dur="300" d="M300 350 L325 410"/>
+        <text class="t-s center tx-muted fade" data-delay="2600" x="300" y="452">integrator</text>
+        <!-- the AI work box on the right, hand on the wheel -->
+        <path class="ink green draw" data-delay="2900" data-dur="600" d="M490 210 L710 210 L710 330 L490 330 Z"/>
+        <circle class="ink blue draw fill-none thin" data-delay="3400" data-dur="500" cx="600" cy="262" r="24"/>
+        <path class="ink blue draw thin" data-delay="3800" data-dur="200" d="M600 238 L600 226 M600 286 L600 298 M576 262 L564 262 M624 262 L636 262"/>
+        <text class="t-s center tx-green fade" data-delay="4100" x="600" y="316">AI work</text>
+        <!-- verdict -->
+        <text class="t-m center tx-coral fade" data-delay="4600" x="500" y="512">drives the AI</text>
+        <text class="t-m center tx-blue fade" data-delay="5100" x="500" y="562">supervises every step</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 15 · THE INTEGRATOR WORKS THE GATES -->
+  <section class="scene" data-dur="8000" data-sub="But the integrator's most critical job is at the gates: helping the client open the entry gate and close the exit gate, on time. The human moves the project forward, not the AI.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center fade" data-delay="150" x="500" y="120">…and works the gates</text>
+        <!-- entry gate (left) -->
+        <path class="ink green draw fat" data-delay="700" data-dur="500" d="M230 200 L230 440"/>
+        <text class="t-s center tx-green fade" data-delay="1200" x="230" y="180">entry</text>
+        <!-- exit gate (right) -->
+        <path class="ink coral draw fat" data-delay="900" data-dur="500" d="M770 200 L770 440"/>
+        <text class="t-s center tx-coral fade" data-delay="1400" x="770" y="180">exit</text>
+        <!-- integrator in the middle, reaching both gates -->
+        <circle class="ink draw fill-none" data-delay="1800" data-dur="400" cx="500" cy="250" r="28"/>
+        <path class="ink draw" data-delay="2200" data-dur="400" d="M500 278 L500 370"/>
+        <path class="ink green draw fat" data-delay="2500" data-dur="400" d="M500 300 L262 244"/>
+        <path class="ink coral draw fat" data-delay="2700" data-dur="400" d="M500 300 L738 244"/>
+        <path class="ink draw" data-delay="2900" data-dur="300" d="M500 370 L474 430"/>
+        <path class="ink draw" data-delay="3050" data-dur="300" d="M500 370 L526 430"/>
+        <!-- verdict -->
+        <text class="t-m center fade" data-delay="3500" x="500" y="500">helps the client open + close</text>
+        <text class="t-s center tx-muted fade" data-delay="4100" x="500" y="552">on time — the human, not the AI</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 16 · CLOSING -->
+  <section class="scene" data-dur="7600" data-sub="The AI shrinks the boxes. Only the client moves the gates. And the integrator drives both.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-m center fade" data-delay="200" x="500" y="170">The AI shrinks the <tspan class="tx-blue">boxes.</tspan></text>
+        <text class="t-m center fade" data-delay="1000" x="500" y="250">Only the client moves the <tspan class="tx-coral">gates.</tspan></text>
+        <text class="t-m center fade" data-delay="1800" x="500" y="330">The <tspan class="tx-amber">integrator</tspan> drives both.</text>
+        <path class="ink amber draw" data-delay="2500" data-dur="900"
+              d="M250 400 Q500 428 760 394 Q680 416 420 412 Q320 412 250 400"/>
+        <text class="t-s center tx-muted fade" data-delay="3300" x="500" y="500">— The Chunking Project Theory</text>
       </g>
     </svg>
   </section>
@@ -617,7 +677,7 @@
   <button id="next" title="Next (→)">▶</button>
   <button id="replay" title="Replay (R)">↻ replay</button>
   <button id="mute" title="Mute / Unmute (M)">🔊</button>
-  <span id="counter">1 / 21</span>
+  <span id="counter">1 / 23</span>
   <span class="hint">space=play/pause · ←/→=scene · M=mute · R=replay</span>
 </div>
 

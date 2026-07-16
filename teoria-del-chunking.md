@@ -55,6 +55,15 @@ Principios:
   - **Integraciones** — bloqueadas sin las **especificaciones de las APIs** (y accesos) del cliente o de terceros.
   - **Migración de datos** — bloqueada sin los **datos limpios** del cliente.
 
+## El rol del integrador: conduce la IA y trabaja las puertas
+
+La IA no opera sola. En cada chunk hay una **persona al mando —el integrador—** y su rol es el más crítico del modelo. Tiene dos frentes:
+
+- **Dentro de la caja** — el integrador **conduce la IA y la supervisa en cada paso**. La IA acelera el trabajo interno, pero no decide sola: alguien la dirige, revisa lo que produce y responde por el resultado. Sin ese conductor, no hay trabajo verde comprimido; hay output sin control.
+- **En las puertas** — su trabajo más crítico es **ayudar al cliente a abrir la puerta de entrada y cerrar la de salida, a tiempo**. Las puertas las abre el cliente, pero el integrador es quien las provoca: prepara el artefacto listo para decidir, persigue el input que falta, reduce la latencia de cada dependencia. Quien mueve el proyecto hacia adelante es el humano, no la IA.
+
+Por eso, aunque la IA encoja las cajas, **el camino crítico lo trabaja una persona**: la IA no abre puertas ni se conduce sola.
+
 ## El giro de la tesis: la IA encoge las cajas, no mueve las puertas
 
 Con esta anatomía, la tesis se vuelve geométrica:
