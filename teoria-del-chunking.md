@@ -4,7 +4,7 @@
 
 ## Premisa: la obsesión del 10x
 
-Las empresas de implementación de proyectos están obsesionadas con ir **10x más rápido** gracias a la IA. La aspiración es comprimir un proyecto de 1 año en 1 mes.
+Las empresas de implementación de proyectos están obsesionadas con ir **10x más rápido** gracias a la IA. La aspiración es comprimir un proyecto de 1 año en poco más de un mes (1 año ÷ 10 ≈ 1,2 meses).
 
 Esta teoría sostiene que esa compresión **no es posible en el caso general**, y explica por qué.
 
@@ -112,7 +112,7 @@ Si el implementador va mucho más rápido pero el cliente no reduce sus tiempos 
 Cuando el cliente **no puede** reducir sus tiempos de respuesta al ritmo de la aceleración, quedan dos salidas:
 
 1. **Mantener el tamaño de los chunks y reducir el equipo.** Si el cliente solo puede cerrar dependencias cada 3 semanas, no tiene sentido un equipo dimensionado para producir cada 3 días. Se ajusta el equipo al ritmo real del cliente, no al ritmo posible del implementador.
-2. **Reconocer que la compresión pretendida es imposible.** No se puede hacer el proyecto de 1 año en 1 mes, porque el camino crítico está fuera del control del implementador.
+2. **Reconocer que la compresión pretendida es imposible.** No se puede hacer el proyecto de 1 año en poco más de un mes (los ~1,2 meses del «10x»), porque el camino crítico está fuera del control del implementador.
 
 La aceleración por IA no elimina el camino crítico del cliente. Solo cambia quién es el cuello de botella.
 
