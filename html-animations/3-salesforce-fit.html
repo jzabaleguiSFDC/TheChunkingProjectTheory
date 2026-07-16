@@ -132,6 +132,25 @@
 </head>
 <body>
 
+<!-- persistent chapter label + cross-animation nav (shared across all four) -->
+<style>
+  #corner{position:fixed;top:16px;left:24px;z-index:40;font-family:inherit;
+    font-size:clamp(14px,1.9vw,19px);font-weight:700;color:var(--ink);opacity:.9;
+    transform:rotate(-1deg);pointer-events:none;letter-spacing:.01em}
+  #corner b{color:var(--coral)}
+  #animnav{position:fixed;top:13px;right:22px;z-index:40;display:flex;gap:10px}
+  #animnav a{font-family:inherit;font-size:15px;font-weight:700;color:var(--ink);
+    text-decoration:none;background:#fff;border:3px solid var(--ink);border-radius:12px;
+    padding:6px 13px;box-shadow:2px 3px 0 rgba(45,42,38,.25);transition:transform .08s ease}
+  #animnav a:hover{transform:translateY(-1px)}
+  #animnav a:active{transform:translate(1px,2px);box-shadow:1px 1px 0 rgba(45,42,38,.25)}
+</style>
+<div id="corner">The Chunking Project Theory · <b>Fit in Salesforce</b></div>
+<nav id="animnav">
+  <a href="https://htmlpreview.github.io/?https://github.com/jzabaleguiSFDC/TheChunkingProjectTheory/blob/main/html-animations/2-chunk-definition.html" title="Previous: Anatomy of a Chunk">‹ prev</a>
+  <a href="https://htmlpreview.github.io/?https://github.com/jzabaleguiSFDC/TheChunkingProjectTheory/blob/main/html-animations/4-architects-mastering-ai.html" title="Next: Architects Mastering AI">next ›</a>
+</nav>
+
 <!-- shared sketch/wobble filter -->
 <svg width="0" height="0" style="position:absolute">
   <filter id="sketch" x="-8%" y="-8%" width="116%" height="116%">

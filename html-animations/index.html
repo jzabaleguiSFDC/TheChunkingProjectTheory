@@ -100,7 +100,6 @@
       <div class="desc">What the theory is: how AI accelerates a project, and why the pace is shared with the customer — the critical path runs through their dependencies.</div>
       <div class="actions">
         <a class="btn primary" data-live="1-intro.html" href="#">▶ Play</a>
-        <a class="btn ghost" data-src="1-intro.html" href="#">Source</a>
       </div>
     </div>
 
@@ -112,7 +111,6 @@
       <div class="desc">Entry gate → internal work → exit gate. AI shrinks the work inside each chunk; the customer's gates are where the project's real rhythm lives.</div>
       <div class="actions">
         <a class="btn primary" data-live="2-chunk-definition.html" href="#">▶ Play</a>
-        <a class="btn ghost" data-src="2-chunk-definition.html" href="#">Source</a>
       </div>
     </div>
 
@@ -124,7 +122,6 @@
       <div class="desc">Where the theory lands: SEAP, AI Delivery and Quantum Leap — and which lever actually shifts the timeline versus which reinvests the gains in scope and quality.</div>
       <div class="actions">
         <a class="btn primary" data-live="3-salesforce-fit.html" href="#">▶ Play</a>
-        <a class="btn ghost" data-src="3-salesforce-fit.html" href="#">Source</a>
       </div>
     </div>
 
@@ -136,7 +133,6 @@
       <div class="desc">AI Fluency vs AI Assets, cutting through the noise, and the AI Pills that build the muscle to spot the use case — not just paste someone else's work.</div>
       <div class="actions">
         <a class="btn primary" data-live="4-architects-mastering-ai.html" href="#">▶ Play</a>
-        <a class="btn ghost" data-src="4-architects-mastering-ai.html" href="#">Source</a>
       </div>
     </div>
 
@@ -169,11 +165,6 @@
 
   document.querySelectorAll("a[data-live]").forEach(function(a){
     a.setAttribute("href", livePreview(a.getAttribute("data-live")));
-    a.setAttribute("target", "_blank"); a.setAttribute("rel","noopener");
-  });
-  document.querySelectorAll("a[data-src]").forEach(function(a){
-    var file = a.getAttribute("data-src");
-    a.setAttribute("href", onGitHub ? ghBlob(file) : file);
     a.setAttribute("target", "_blank"); a.setAttribute("rel","noopener");
   });
 })();
