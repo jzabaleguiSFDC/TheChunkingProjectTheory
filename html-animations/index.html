@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Chunking Project Theory</title>
+<style>
+  :root{
+    --sf-blue:#0176D3;
+    --sf-blue-dark:#032D60;
+    --sf-blue-light:#1B96FF;
+    --sf-navy:#03234D;
+    --sf-cloud:#EAF5FE;
+    --sf-cloud-2:#D8EDFF;
+    --sf-text:#1B1B1B;
+    --sf-gray:#706E6B;
+    --sf-line:#E5E5E5;
+    --sf-bg-soft:#F5F8FB;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Salesforce Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    color:var(--sf-text);background:var(--sf-bg-soft);
+    -webkit-font-smoothing:antialiased;min-height:100vh;
+  }
+  .brandbar{height:8px;background:linear-gradient(90deg,var(--sf-blue-dark),var(--sf-blue) 55%,var(--sf-blue-light))}
+
+  header{
+    background:radial-gradient(120% 140% at 12% 0%,var(--sf-blue) 0%,var(--sf-blue-dark) 50%,var(--sf-navy) 100%);
+    color:#fff;padding:64px 8vw 72px;
+  }
+  header .eyebrow{font-size:14px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#BFE0FB;margin-bottom:22px}
+  header h1{font-size:clamp(40px,6.5vw,78px);line-height:1.02;font-weight:800;letter-spacing:-.025em;max-width:16ch}
+  header h1 .dot{color:#8FCBFF}
+  header .tagline{font-size:clamp(19px,2.6vw,26px);font-weight:600;color:#EAF5FE;margin-top:22px;letter-spacing:.01em}
+  header p{font-size:clamp(16px,2.1vw,20px);line-height:1.5;color:#CFE7FA;margin-top:18px;max-width:62ch}
+  header .who{margin-top:30px;font-size:15px;color:#9FC9EC;letter-spacing:.03em}
+
+  main{max-width:1120px;margin:0 auto;padding:56px 6vw 70px}
+  .sec-title{font-size:15px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sf-blue);
+    display:flex;align-items:center;gap:10px;margin:0 0 8px}
+  .sec-title::before{content:"";width:26px;height:3px;border-radius:2px;background:var(--sf-blue)}
+  .sec-sub{color:var(--sf-gray);font-size:17px;margin:0 0 28px;max-width:60ch;line-height:1.45}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+
+  .card{
+    background:#fff;border:1px solid var(--sf-line);border-radius:18px;overflow:hidden;
+    display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(3,45,96,.07);
+    transition:transform .12s ease,box-shadow .12s ease;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(3,45,96,.14)}
+  .card .top{padding:26px 26px 4px;display:flex;align-items:flex-start;gap:16px}
+  .num{flex:none;width:54px;height:54px;border-radius:14px;background:var(--sf-cloud);
+    display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:var(--sf-blue)}
+  .card h2{font-size:24px;font-weight:700;color:var(--sf-blue-dark);line-height:1.15}
+  .card .tag{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sf-gray);margin-top:4px}
+  .card .desc{padding:14px 26px 22px;font-size:17px;line-height:1.45;color:var(--sf-text);flex:1}
+  .card .actions{padding:0 26px 24px;display:flex;gap:12px;flex-wrap:wrap}
+  .btn{
+    font-size:15px;font-weight:600;text-decoration:none;border-radius:10px;padding:10px 18px;
+    display:inline-flex;align-items:center;gap:7px;transition:background .15s,transform .08s,border-color .15s;
+  }
+  .btn.primary{background:var(--sf-blue);color:#fff}
+  .btn.primary:hover{background:var(--sf-blue-dark)}
+  .btn.ghost{background:#fff;color:var(--sf-blue-dark);border:2px solid var(--sf-cloud-2)}
+  .btn.ghost:hover{border-color:var(--sf-blue-light)}
+  .btn:active{transform:translateY(1px)}
+
+  .note{margin-top:44px;font-size:14px;color:var(--sf-gray);line-height:1.5;border-top:1px solid var(--sf-line);padding-top:22px}
+  .note code{background:#fff;border:1px solid var(--sf-line);border-radius:6px;padding:2px 7px;font-size:13px}
+
+  footer{padding:26px 6vw 40px;text-align:center;color:var(--sf-gray);font-size:14px}
+  footer .brand{font-weight:700;color:var(--sf-blue-dark)}
+  footer .brand span{color:var(--sf-blue)}
+</style>
+</head>
+<body>
+<div class="brandbar"></div>
+
+<header>
+  <div class="eyebrow">Understanding AI in Projects</div>
+  <h1>The Chunking Project&nbsp;Theory<span class="dot">.</span></h1>
+  <p class="tagline">A lens for how AI really reshapes delivery — the work, the chunks, and the central role of the customer.</p>
+  <p>Not hype and not doom: a realistic model of where AI accelerates a project, where the customer sets the pace, and how to turn that into an advantage.</p>
+  <div class="who">Salesforce Professional Services · Iberia</div>
+</header>
+
+<main>
+
+  <div class="sec-title">The animations</div>
+  <p class="sec-sub">Four short, narrated explainers — the fastest way into the theory. Each opens in the browser; click once to start the narration.</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="top">
+        <div class="num">1</div>
+        <div><h2>Intro</h2><div class="tag">Narrated · ~1 min</div></div>
+      </div>
+      <div class="desc">What the theory is: how AI accelerates a project, and why the pace is shared with the customer — the critical path runs through their dependencies.</div>
+      <div class="actions">
+        <a class="btn primary" data-live="1-intro.html" href="#">▶ Play</a>
+        <a class="btn ghost" data-src="1-intro.html" href="#">Source</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="top">
+        <div class="num">2</div>
+        <div><h2>Anatomy of a Chunk</h2><div class="tag">Narrated · ~1 min</div></div>
+      </div>
+      <div class="desc">Entry gate → internal work → exit gate. AI shrinks the work inside each chunk; the customer's gates are where the project's real rhythm lives.</div>
+      <div class="actions">
+        <a class="btn primary" data-live="2-chunk-definition.html" href="#">▶ Play</a>
+        <a class="btn ghost" data-src="2-chunk-definition.html" href="#">Source</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="top">
+        <div class="num">3</div>
+        <div><h2>Fit in Salesforce</h2><div class="tag">Narrated · ~1 min</div></div>
+      </div>
+      <div class="desc">Where the theory lands: SEAP, AI Delivery and Quantum Leap — and which lever actually shifts the timeline versus which reinvests the gains in scope and quality.</div>
+      <div class="actions">
+        <a class="btn primary" data-live="3-salesforce-fit.html" href="#">▶ Play</a>
+        <a class="btn ghost" data-src="3-salesforce-fit.html" href="#">Source</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="top">
+        <div class="num">4</div>
+        <div><h2>Architects Mastering AI</h2><div class="tag">Narrated · ~1 min</div></div>
+      </div>
+      <div class="desc">AI Fluency vs AI Assets, cutting through the noise, and the AI Pills that build the muscle to spot the use case — not just paste someone else's work.</div>
+      <div class="actions">
+        <a class="btn primary" data-live="4-architects-mastering-ai.html" href="#">▶ Play</a>
+        <a class="btn ghost" data-src="4-architects-mastering-ai.html" href="#">Source</a>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="note">
+    <b>How the links work.</b> Each animation is a self-contained HTML file. Opened locally it runs directly; on GitHub it opens through
+    <code>htmlpreview.github.io</code> so the page renders instead of showing raw code. Narration uses the browser's speech engine.
+  </p>
+
+</main>
+
+<footer>
+  <span class="brand">salesforce<span>.</span></span> &nbsp;·&nbsp; The Chunking Project Theory
+</footer>
+
+<script>
+(function(){
+  // Repo coordinates — used only when this index is opened FROM github/htmlpreview.
+  var OWNER = "jzabaleguiSFDC", REPO = "TheChunkingProjectTheory", BRANCH = "main";
+  var DIR = "html-animations/";   // this index lives inside the animations folder
+  var onGitHub = /githubusercontent|htmlpreview\.github\.io|github\.io|github\.com/i.test(location.hostname + location.href);
+
+  function ghBlob(file){ return "https://github.com/"+OWNER+"/"+REPO+"/blob/"+BRANCH+"/"+DIR+file; }
+  function livePreview(file){
+    // Local: open the file relative (same folder). Remote: render via htmlpreview.
+    if (!onGitHub) return file;
+    return "https://htmlpreview.github.io/?" + ghBlob(file);
+  }
+
+  document.querySelectorAll("a[data-live]").forEach(function(a){
+    a.setAttribute("href", livePreview(a.getAttribute("data-live")));
+    a.setAttribute("target", "_blank"); a.setAttribute("rel","noopener");
+  });
+  document.querySelectorAll("a[data-src]").forEach(function(a){
+    var file = a.getAttribute("data-src");
+    a.setAttribute("href", onGitHub ? ghBlob(file) : file);
+    a.setAttribute("target", "_blank"); a.setAttribute("rel","noopener");
+  });
+})();
+</script>
+</body>
+</html>
