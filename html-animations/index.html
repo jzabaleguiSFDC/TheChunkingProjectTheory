@@ -73,6 +73,37 @@
   footer{padding:26px 6vw 40px;text-align:center;color:var(--sf-gray);font-size:14px}
   footer .brand{font-weight:700;color:var(--sf-blue-dark)}
   footer .brand span{color:var(--sf-blue)}
+
+  /* ===== ANIMATION MODAL ===== */
+  .modal{
+    position:fixed;inset:0;z-index:100;display:none;
+    align-items:center;justify-content:center;padding:3vh 3vw;
+    background:rgba(3,35,77,.62);backdrop-filter:blur(3px);
+  }
+  .modal.open{display:flex;animation:modalfade .18s ease both}
+  @keyframes modalfade{from{opacity:0}to{opacity:1}}
+  .modal-card{
+    width:min(1180px,100%);height:min(760px,94vh);
+    background:#fff;border-radius:16px;overflow:hidden;
+    display:flex;flex-direction:column;
+    box-shadow:0 24px 70px rgba(3,35,77,.5);
+    animation:modalpop .2s ease both;
+  }
+  @keyframes modalpop{from{transform:translateY(12px) scale(.985)}to{transform:none}}
+  .modal-bar{
+    flex:none;height:52px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 14px 0 20px;background:var(--sf-blue-dark);color:#fff;
+  }
+  .modal-title{font-size:16px;font-weight:700;letter-spacing:.01em}
+  .modal-actions{display:flex;gap:8px}
+  .modal-btn{
+    width:34px;height:34px;border:none;border-radius:9px;cursor:pointer;
+    background:rgba(255,255,255,.14);color:#fff;font-size:16px;line-height:1;
+    display:inline-flex;align-items:center;justify-content:center;text-decoration:none;
+    transition:background .15s;
+  }
+  .modal-btn:hover{background:rgba(255,255,255,.28)}
+  #modalFrame{flex:1;width:100%;border:none;background:#fff}
 </style>
 </head>
 <body>
@@ -139,11 +170,25 @@
   </div>
 
   <p class="note">
-    <b>How the links work.</b> Each animation is a self-contained HTML file. Opened locally it runs directly; on GitHub it opens through
-    <code>htmlpreview.github.io</code> so the page renders instead of showing raw code. Narration uses the browser's speech engine.
+    <b>How it works.</b> Each animation is a self-contained HTML file that opens <b>right here in a window</b> (press <code>Esc</code> or click outside to close);
+    use <code>↗</code> to pop it out to a full tab. Opened locally it runs directly; on GitHub it renders through
+    <code>htmlpreview.github.io</code>. Narration uses the browser's speech engine — click once inside the window to start it.
   </p>
 
 </main>
+
+<div id="modal" class="modal" aria-hidden="true">
+  <div class="modal-card">
+    <div class="modal-bar">
+      <span class="modal-title" id="modalTitle"></span>
+      <div class="modal-actions">
+        <a class="modal-btn" id="modalOpen" href="#" target="_blank" rel="noopener" title="Open in a new tab">↗</a>
+        <button class="modal-btn" id="modalClose" title="Close (Esc)">✕</button>
+      </div>
+    </div>
+    <iframe id="modalFrame" title="Animation" allow="autoplay; fullscreen"></iframe>
+  </div>
+</div>
 
 <footer>
   <span class="brand">salesforce<span>.</span></span> &nbsp;·&nbsp; The Chunking Project Theory
@@ -163,9 +208,42 @@
     return "https://htmlpreview.github.io/?" + ghBlob(file);
   }
 
+  var modal   = document.getElementById("modal");
+  var frame   = document.getElementById("modalFrame");
+  var titleEl = document.getElementById("modalTitle");
+  var openEl  = document.getElementById("modalOpen");
+
+  function openModal(url, title){
+    titleEl.textContent = title || "";
+    openEl.setAttribute("href", url);
+    frame.setAttribute("src", url);
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden","false");
+    document.body.style.overflow = "hidden";
+  }
+  function closeModal(){
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden","true");
+    frame.setAttribute("src","about:blank");   // stop narration/audio
+    document.body.style.overflow = "";
+  }
+
   document.querySelectorAll("a[data-live]").forEach(function(a){
-    a.setAttribute("href", livePreview(a.getAttribute("data-live")));
-    a.setAttribute("target", "_blank"); a.setAttribute("rel","noopener");
+    var url = livePreview(a.getAttribute("data-live"));
+    var card = a.closest(".card");
+    var title = card ? (card.querySelector("h2")||{}).textContent : "";
+    // Fallback link target if JS-driven modal is bypassed.
+    a.setAttribute("href", url);
+    a.addEventListener("click", function(e){
+      e.preventDefault();
+      openModal(url, title);
+    });
+  });
+
+  document.getElementById("modalClose").addEventListener("click", closeModal);
+  modal.addEventListener("click", function(e){ if (e.target === modal) closeModal(); });
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape" && modal.classList.contains("open")) closeModal();
   });
 })();
 </script>
