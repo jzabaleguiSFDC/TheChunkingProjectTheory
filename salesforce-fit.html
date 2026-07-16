@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Chunking Project Theory — Where It Fits in Salesforce</title>
+<style>
+  :root{
+    --paper:#fbf7ec;
+    --ink:#2d2a26;
+    --coral:#e8503a;
+    --blue:#2f6fed;
+    --amber:#f2b01e;
+    --green:#3aa856;
+    --muted:#b9b2a2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Comic Sans MS","Chalkboard SE","Comic Neue","Segoe Print","Bradley Hand",cursive,sans-serif;
+    overflow:hidden;
+    display:flex;flex-direction:column;
+    /* faint paper grid */
+    background-image:
+      linear-gradient(rgba(45,42,38,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45,42,38,.035) 1px, transparent 1px);
+    background-size:26px 26px;
+  }
+  #stage{
+    position:relative;flex:1;min-height:0;
+    display:flex;align-items:center;justify-content:center;
+    padding-bottom:120px; /* reserve room for the caption band */
+  }
+  .scene{
+    position:absolute;inset:0 0 120px 0; /* keep drawings above the caption */
+    display:none;
+    align-items:center;justify-content:center;
+  }
+  .scene.active{display:flex}
+  svg.board{width:min(94vw,1180px);height:auto;max-height:72vh;overflow:visible}
+
+  /* draw-on effect handled via JS (stroke-dashoffset) */
+  .ink{fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+  .thin{stroke-width:3.5}
+  .fat{stroke-width:8}
+  .coral{stroke:var(--coral)}
+  .blue{stroke:var(--blue)}
+  .amber{stroke:var(--amber)}
+  .green{stroke:var(--green)}
+  .muted{stroke:var(--muted)}
+  .fill-none{fill:none}
+
+  text{font-family:inherit;fill:var(--ink)}
+  .t-title{font-size:76px;font-weight:700}
+  .t-big{font-size:120px;font-weight:700}
+  .t-h{font-size:44px;font-weight:700}
+  .t-m{font-size:30px}
+  .t-s{font-size:24px}
+  .tx-coral{fill:var(--coral)}
+  .tx-blue{fill:var(--blue)}
+  .tx-green{fill:var(--green)}
+  .tx-amber{fill:var(--amber)}
+  .tx-muted{fill:var(--muted)}
+  .center{text-anchor:middle}
+
+  /* pop-in for solid elements / text */
+  .pop{opacity:0;transform-box:fill-box;transform-origin:center}
+  .pop.go{animation:pop .55s cubic-bezier(.2,1.4,.4,1) both}
+  @keyframes pop{
+    0%{opacity:0;transform:scale(.4) rotate(-4deg)}
+    100%{opacity:1;transform:scale(1) rotate(0)}
+  }
+  .fade{opacity:0}
+  .fade.go{animation:fade .6s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  /* subtitle / caption bar */
+  #caption{
+    position:fixed;left:50%;bottom:84px;transform:translateX(-50%);
+    z-index:5;
+    max-width:min(90vw,1000px);
+    background:var(--ink);color:var(--paper);
+    padding:12px 26px;border-radius:14px;
+    font-size:clamp(17px,2.3vw,25px);line-height:1.3;text-align:center;
+    box-shadow:4px 5px 0 rgba(45,42,38,.25);
+    opacity:0;transition:opacity .3s ease, transform .3s ease;
+    pointer-events:none;
+  }
+  #caption.show{opacity:1}
+
+  /* controls */
+  #bar{position:relative;height:6px;background:rgba(45,42,38,.12)}
+  #fill{position:absolute;left:0;top:0;height:100%;width:0;background:var(--coral)}
+  #controls{
+    display:flex;align-items:center;gap:14px;justify-content:center;
+    padding:10px;font-size:14px;color:var(--ink);
+  }
+  #controls button{
+    font-family:inherit;font-size:16px;cursor:pointer;
+    background:var(--paper);color:var(--ink);
+    border:3px solid var(--ink);border-radius:10px;
+    padding:6px 14px;box-shadow:2px 3px 0 rgba(45,42,38,.25);
+    transition:transform .08s ease;
+  }
+  #controls button:hover{transform:translateY(-1px)}
+  #controls button:active{transform:translate(1px,2px);box-shadow:1px 1px 0 rgba(45,42,38,.25)}
+  #counter{min-width:70px;text-align:center;color:var(--muted)}
+  .hint{color:var(--muted);font-size:12px}
+
+  /* start gate overlay (unlocks browser audio on first click) */
+  #startgate{
+    position:fixed;inset:0;z-index:50;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(251,247,236,.94);
+    cursor:pointer;transition:opacity .4s ease;
+    background-image:
+      linear-gradient(rgba(45,42,38,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45,42,38,.04) 1px, transparent 1px);
+    background-size:26px 26px;
+  }
+  #startgate.hide{opacity:0;pointer-events:none}
+  .gatebox{text-align:center;transform:rotate(-1.2deg)}
+  .gateicon{font-size:72px;animation:bob 1.8s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .gatetitle{font-size:clamp(30px,5vw,54px);font-weight:700;color:var(--coral);margin:10px 0}
+  .gatehint{font-size:clamp(16px,2.4vw,24px);color:var(--ink);
+    border:3px solid var(--ink);border-radius:14px;padding:10px 22px;display:inline-block;
+    box-shadow:3px 4px 0 rgba(45,42,38,.2);background:#fff}
+</style>
+</head>
+<body>
+
+<!-- shared sketch/wobble filter -->
+<svg width="0" height="0" style="position:absolute">
+  <filter id="sketch" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2"/>
+  </filter>
+</svg>
+
+<div id="startgate">
+  <div class="gatebox">
+    <div class="gateicon">⚡</div>
+    <div class="gatetitle">Where It Fits in Salesforce</div>
+    <div class="gatehint">Click anywhere to play with narration</div>
+  </div>
+</div>
+
+<div id="stage">
+
+  <!-- 1 · TITLE -->
+  <section class="scene" data-dur="4600" data-sub="Where this theory fits inside Salesforce.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-title center fade" data-delay="150" x="500" y="230">Where it fits</text>
+        <text class="t-title center tx-coral fade" data-delay="500" x="500" y="320">in Salesforce</text>
+        <!-- little box + gate preview -->
+        <path class="ink green draw" data-delay="1100" data-dur="500" d="M410 400 L500 400 L500 470 L410 470 Z"/>
+        <path class="ink coral draw fat" data-delay="1600" data-dur="400" d="M560 390 L560 480"/>
+        <text class="t-s center tx-muted fade" data-delay="2200" x="500" y="530">boxes vs. gates — one more time</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 2 · TWO AXES RECAP -->
+  <section class="scene" data-dur="7200" data-sub="Recall the two axes: shrinking the boxes is the offer side; moving the gates is the client side — and only the gates sit on the critical path.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <!-- offer side -->
+        <g><rect class="pop" data-delay="300" x="90" y="180" width="380" height="240" rx="18" fill="#e9f6ee" stroke="#3aa856" stroke-width="5"/>
+           <text class="t-h center tx-green fade" data-delay="650" x="280" y="250">shrink boxes</text>
+           <text class="t-s center tx-muted fade" data-delay="1000" x="280" y="300">the offer side</text>
+           <text class="t-s center tx-muted fade" data-delay="1150" x="280" y="340">(the integrator)</text>
+           <text class="t-s center tx-muted fade" data-delay="1350" x="280" y="392">not on critical path</text></g>
+        <!-- client side -->
+        <g><rect class="pop" data-delay="2100" x="530" y="180" width="380" height="240" rx="18" fill="#fdeee9" stroke="#e8503a" stroke-width="5"/>
+           <text class="t-h center tx-coral fade" data-delay="2450" x="720" y="250">move gates</text>
+           <text class="t-s center tx-muted fade" data-delay="2800" x="720" y="300">the client side</text>
+           <text class="t-s center tx-muted fade" data-delay="3100" x="720" y="392">this IS the critical path</text></g>
+        <text class="t-s center tx-muted fade" data-delay="4000" x="500" y="500">every initiative lands on one axis or the other</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 3 · AI SOLUTIONS RECAP: one box each -->
+  <section class="scene" data-dur="7200" data-sub="So far, every AI Solution shrinks one box: Setup Agents, Slackbot, LucidAI, OAT — each one a single chunk.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center tx-green fade" data-delay="150" x="500" y="110">AI Solutions today</text>
+        <!-- four small green boxes, each labelled -->
+        <g><rect class="pop" data-delay="700" x="90"  y="230" width="200" height="120" rx="12" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="900" x="190" y="298">Setup Agents</text></g>
+        <g><rect class="pop" data-delay="1300" x="320" y="230" width="200" height="120" rx="12" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="1500" x="420" y="298">Slackbot</text></g>
+        <g><rect class="pop" data-delay="1900" x="550" y="230" width="200" height="120" rx="12" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="2100" x="650" y="298">LucidAI</text></g>
+        <g><rect class="pop" data-delay="2500" x="780" y="230" width="130" height="120" rx="12" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="2700" x="845" y="298">OAT</text></g>
+        <text class="t-s center tx-muted fade" data-delay="3400" x="500" y="430">one asset · one chunk · one box</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 4 · SEAP INTRO -->
+  <section class="scene" data-dur="7400" data-sub="Then there is SEAP: a multitool that calls the model in different roles and saves everything it does to memory.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-title center tx-blue fade" data-delay="150" x="500" y="150">SEAP</text>
+        <text class="t-s center tx-muted fade" data-delay="600" x="500" y="200">a multitool over the LLM</text>
+        <!-- central hub -->
+        <circle class="ink blue draw fill-none fat" data-delay="1000" data-dur="500" cx="500" cy="360" r="60"/>
+        <text class="t-s center tx-blue fade" data-delay="1500" x="500" y="368">SEAP</text>
+        <!-- role spokes -->
+        <path class="ink blue draw thin" data-delay="1800" data-dur="300" d="M452 322 L360 270"/>
+        <path class="ink blue draw thin" data-delay="1950" data-dur="300" d="M548 322 L640 270"/>
+        <path class="ink blue draw thin" data-delay="2100" data-dur="300" d="M452 398 L360 450"/>
+        <path class="ink blue draw thin" data-delay="2250" data-dur="300" d="M548 398 L640 450"/>
+        <text class="t-s center tx-muted fade" data-delay="2500" x="330" y="258">role</text>
+        <text class="t-s center tx-muted fade" data-delay="2650" x="670" y="258">role</text>
+        <text class="t-s center tx-muted fade" data-delay="2800" x="330" y="478">role</text>
+        <text class="t-s center tx-muted fade" data-delay="2950" x="670" y="478">role</text>
+        <!-- memory disk -->
+        <ellipse class="ink amber draw fill-none" data-delay="3300" data-dur="400" cx="500" cy="500" rx="70" ry="20"/>
+        <text class="t-s center tx-amber fade" data-delay="3700" x="500" y="506">memory</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 5 · SEAP ASPIRES ABOVE ALL CHUNKS -->
+  <section class="scene" data-dur="7400" data-sub="SEAP aspires to sit above all the project chunks — covering many boxes at once, instead of one.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <!-- umbrella SEAP bar on top -->
+        <path class="ink blue draw fat" data-delay="150" data-dur="900" d="M120 170 L880 170"/>
+        <text class="t-h center tx-blue fade" data-delay="900" x="500" y="140">SEAP</text>
+        <!-- brackets down to many boxes -->
+        <path class="ink blue draw thin" data-delay="1300" data-dur="300" d="M200 170 L200 250"/>
+        <path class="ink blue draw thin" data-delay="1450" data-dur="300" d="M360 170 L360 250"/>
+        <path class="ink blue draw thin" data-delay="1600" data-dur="300" d="M520 170 L520 250"/>
+        <path class="ink blue draw thin" data-delay="1750" data-dur="300" d="M680 170 L680 250"/>
+        <path class="ink blue draw thin" data-delay="1900" data-dur="300" d="M800 170 L800 250"/>
+        <!-- row of chunk boxes it tries to cover -->
+        <g><rect class="pop" data-delay="2200" x="140" y="270" width="120" height="90" rx="10" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/></g>
+        <g><rect class="pop" data-delay="2350" x="300" y="270" width="120" height="90" rx="10" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/></g>
+        <g><rect class="pop" data-delay="2500" x="460" y="270" width="120" height="90" rx="10" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/></g>
+        <g><rect class="pop" data-delay="2650" x="620" y="270" width="120" height="90" rx="10" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/></g>
+        <g><rect class="pop" data-delay="2800" x="740" y="270" width="120" height="90" rx="10" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/></g>
+        <text class="t-s center tx-muted fade" data-delay="3400" x="500" y="330">many chunks</text>
+        <text class="t-m center tx-blue fade" data-delay="4000" x="500" y="450">one tool, many boxes at once</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 6 · SEAP VERDICT: still only boxes -->
+  <section class="scene" data-dur="7800" data-sub="But SEAP still only shrinks boxes. It does not move the gates — the client cannot go faster than the client goes.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <!-- fixed gates -->
+        <path class="ink coral draw fat" data-delay="150" data-dur="500" d="M260 150 L260 460"/>
+        <path class="ink coral draw fat" data-delay="400" data-dur="500" d="M740 150 L740 460"/>
+        <text class="t-s center tx-coral fade" data-delay="800" x="260" y="130">gate</text>
+        <text class="t-s center tx-coral fade" data-delay="900" x="740" y="130">gate</text>
+        <!-- SEAP shrinking many tiny boxes in the middle -->
+        <g><rect class="pop" data-delay="1400" x="340" y="290" width="60" height="50" rx="8" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/></g>
+        <g><rect class="pop" data-delay="1550" x="420" y="290" width="60" height="50" rx="8" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/></g>
+        <g><rect class="pop" data-delay="1700" x="500" y="290" width="60" height="50" rx="8" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/></g>
+        <g><rect class="pop" data-delay="1850" x="580" y="290" width="60" height="50" rx="8" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/></g>
+        <text class="t-s center tx-blue fade" data-delay="2300" x="490" y="270">SEAP shrinks these</text>
+        <!-- gates don't move -->
+        <path class="ink coral draw thin" data-delay="2900" data-dur="250" d="M250 500 L200 500"/>
+        <path class="ink coral draw thin" data-delay="3050" data-dur="250" d="M750 500 L800 500"/>
+        <text class="t-m center tx-coral fade" data-delay="3600" x="500" y="520">gates stay put</text>
+        <text class="t-s center tx-muted fade" data-delay="4300" x="500" y="565">critical path unchanged</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 6b · AI DELIVERY (the default without Quantum Leap) -->
+  <section class="scene" data-dur="8200" data-sub="Without Quantum Leap, what you actually have is AI Delivery: the AI helps you deliver faster inside the boxes, but the gates never move.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center tx-amber fade" data-delay="150" x="500" y="100">AI Delivery</text>
+        <text class="t-s center tx-muted fade" data-delay="500" x="500" y="145">the default — no gates moved</text>
+        <!-- fixed deadline bar -->
+        <path class="ink coral draw fat" data-delay="1000" data-dur="300" d="M150 210 L150 300"/>
+        <path class="ink coral draw fat" data-delay="1200" data-dur="300" d="M850 210 L850 300"/>
+        <path class="ink muted draw" data-delay="1500" data-dur="700" d="M160 255 L840 255"/>
+        <text class="t-s center tx-coral fade" data-delay="2200" x="500" y="205">same deadline — gates fixed</text>
+        <!-- freed capacity -->
+        <path class="ink green draw" data-delay="2700" data-dur="500" d="M360 290 L640 290 L640 340 L360 340 Z"/>
+        <text class="t-s center tx-green fade" data-delay="3200" x="500" y="322">freed capacity</text>
+        <!-- fork into two outcomes -->
+        <path class="ink draw thin" data-delay="3600" data-dur="300" d="M500 340 L320 400"/>
+        <path class="ink draw thin" data-delay="3750" data-dur="300" d="M500 340 L680 400"/>
+        <g><rect class="pop" data-delay="4100" x="180" y="410" width="270" height="90" rx="14" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-m center tx-green fade" data-delay="4300" x="315" y="466">+ scope</text></g>
+        <g><rect class="pop" data-delay="4600" x="550" y="410" width="270" height="90" rx="14" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
+           <text class="t-m center tx-blue fade" data-delay="4800" x="685" y="466">+ quality</text></g>
+        <text class="t-s center tx-muted fade" data-delay="5400" x="500" y="560">it changes WHAT you deliver, not WHEN</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 7 · QUANTUM LEAP INTRO -->
+  <section class="scene" data-dur="7400" data-sub="Quantum Leap is different. It is the global program to redesign the whole delivery model — AI-native, not just AI tools.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-title center tx-coral fade" data-delay="150" x="500" y="160">Quantum Leap</text>
+        <text class="t-s center tx-muted fade" data-delay="700" x="500" y="215">a new operating model</text>
+        <!-- old model small, arrow, new model big -->
+        <path class="ink muted draw" data-delay="1100" data-dur="500" d="M150 300 L330 300 L330 400 L150 400 Z"/>
+        <text class="t-s center tx-muted fade" data-delay="1600" x="240" y="356">old model</text>
+        <path class="ink coral draw fat" data-delay="2000" data-dur="500" d="M380 350 L470 350"/>
+        <path class="ink coral draw" data-delay="2500" data-dur="250" d="M470 350 L442 332"/>
+        <path class="ink coral draw" data-delay="2600" data-dur="250" d="M470 350 L442 368"/>
+        <path class="ink coral draw fat" data-delay="2900" data-dur="700" d="M520 250 L860 250 L860 450 L520 450 Z"/>
+        <text class="t-m center tx-coral fade" data-delay="3600" x="690" y="345">AI-native</text>
+        <text class="t-s center tx-coral fade" data-delay="3800" x="690" y="390">redesign</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 8 · QUANTUM LEAP = BILATERAL COMMITMENT -->
+  <section class="scene" data-dur="8000" data-sub="It is a two-sided commitment: the client agrees to move and tighten their dependencies, and Salesforce agrees to use agents to optimize every chunk.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <!-- client side -->
+        <circle class="ink draw fill-none" data-delay="200" data-dur="400" cx="240" cy="180" r="34"/>
+        <path class="ink draw" data-delay="600" data-dur="300" d="M240 214 L240 300"/>
+        <path class="ink draw" data-delay="800" data-dur="250" d="M240 240 L200 270"/>
+        <path class="ink draw" data-delay="950" data-dur="250" d="M240 240 L280 270"/>
+        <text class="t-s center tx-muted fade" data-delay="1150" x="240" y="130">the client</text>
+        <text class="t-s center tx-coral fade" data-delay="1450" x="240" y="360">moves the gates</text>
+        <text class="t-s center tx-muted fade" data-delay="1650" x="240" y="398">sooner + closer together</text>
+        <!-- handshake in the middle -->
+        <text class="t-big fade" data-delay="2200" x="455" y="290">🤝</text>
+        <!-- salesforce side -->
+        <path class="ink blue draw" data-delay="2800" data-dur="500" d="M700 150 L780 150 L780 210 L700 210 Z"/>
+        <circle class="pop" data-delay="3200" cx="722" cy="180" r="7" fill="#2f6fed"/>
+        <circle class="pop" data-delay="3300" cx="758" cy="180" r="7" fill="#2f6fed"/>
+        <path class="ink blue draw" data-delay="3100" data-dur="300" d="M740 210 L740 300"/>
+        <text class="t-s center tx-muted fade" data-delay="3500" x="740" y="130">Salesforce</text>
+        <text class="t-s center tx-green fade" data-delay="3800" x="740" y="360">agents on every chunk</text>
+        <text class="t-s center tx-muted fade" data-delay="4000" x="740" y="398">shrink every box</text>
+        <text class="t-m center fade" data-delay="4700" x="500" y="500">both sides commit</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 9 · QUANTUM LEAP MOVES THE GATES -->
+  <section class="scene" data-dur="7800" data-sub="This is the only lever in the theory that actually moves the gates — so it is the only one that touches the critical path.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <!-- gates before: far apart -->
+        <text class="t-s tx-muted fade" data-delay="150" x="90" y="200">before</text>
+        <path class="ink muted draw fat" data-delay="300" data-dur="400" d="M200 180 L200 300"/>
+        <path class="ink muted draw fat" data-delay="600" data-dur="400" d="M820 180 L820 300"/>
+        <path class="ink muted draw thin" data-delay="1000" data-dur="500" d="M210 240 L810 240"/>
+        <!-- gates after: pulled together -->
+        <text class="t-s tx-coral fade" data-delay="1700" x="90" y="430">Quantum Leap</text>
+        <path class="ink coral draw fat" data-delay="1900" data-dur="400" d="M360 400 L360 520"/>
+        <path class="ink coral draw fat" data-delay="2200" data-dur="400" d="M640 400 L640 520"/>
+        <!-- arrows pulling in -->
+        <path class="ink coral draw" data-delay="2700" data-dur="300" d="M250 460 L344 460"/>
+        <path class="ink coral draw" data-delay="2900" data-dur="200" d="M344 460 L320 446"/>
+        <path class="ink coral draw" data-delay="3000" data-dur="200" d="M344 460 L320 474"/>
+        <path class="ink coral draw" data-delay="2700" data-dur="300" d="M750 460 L656 460"/>
+        <path class="ink coral draw" data-delay="2900" data-dur="200" d="M656 460 L680 446"/>
+        <path class="ink coral draw" data-delay="3000" data-dur="200" d="M656 460 L680 474"/>
+        <text class="t-m center tx-coral fade" data-delay="3700" x="500" y="475">gates move in</text>
+        <text class="t-s center tx-muted fade" data-delay="4400" x="500" y="575">the project actually compresses</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 9b · THE HARD PART: CONTRACTUAL SPEED COMMITMENTS -->
+  <section class="scene" data-dur="8200" data-sub="But here is the hard part: those speed commitments have to be aligned in the contract. Both sides bind their pace, or it is not Quantum Leap.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center fade" data-delay="150" x="500" y="100">the hard part</text>
+        <!-- contract document -->
+        <path class="ink draw" data-delay="600" data-dur="900" d="M280 150 L720 150 L720 430 L280 430 Z"/>
+        <text class="t-s center tx-muted fade" data-delay="1500" x="500" y="195">CONTRACT</text>
+        <!-- two commitment lines -->
+        <path class="ink coral draw thin" data-delay="1800" data-dur="400" d="M320 248 L680 248"/>
+        <text class="t-s center tx-coral fade" data-delay="2200" x="500" y="288">client: gates on time</text>
+        <path class="ink blue draw thin" data-delay="2600" data-dur="400" d="M320 330 L680 330"/>
+        <text class="t-s center tx-blue fade" data-delay="3000" x="500" y="370">Salesforce: agents at max</text>
+        <!-- two signatures -->
+        <path class="ink coral draw thin" data-delay="3500" data-dur="400" d="M360 405 q20 -18 40 0 q18 16 40 0"/>
+        <path class="ink blue draw thin" data-delay="3800" data-dur="400" d="M560 405 q20 -18 40 0 q18 16 40 0"/>
+        <text class="t-m center tx-coral fade" data-delay="4400" x="500" y="490">speed, signed by both</text>
+        <text class="t-s center tx-muted fade" data-delay="5000" x="500" y="540">no contract → no gate moves → back to AI Delivery</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 10 · THE MAP -->
+  <section class="scene" data-dur="8400" data-sub="The full map: Fluency, Solutions and SEAP shrink boxes — that is AI Delivery. Only Quantum Leap moves the gates.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-h center fade" data-delay="150" x="500" y="90">the map</text>
+        <!-- offer column -->
+        <text class="t-s center tx-green fade" data-delay="600" x="290" y="160">offer side · boxes</text>
+        <g><rect class="pop" data-delay="900"  x="120" y="185" width="340" height="52" rx="12" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="1050" x="290" y="219">AI Fluency</text></g>
+        <g><rect class="pop" data-delay="1300" x="120" y="250" width="340" height="52" rx="12" fill="#e9f6ee" stroke="#3aa856" stroke-width="4"/>
+           <text class="t-s center tx-green fade" data-delay="1450" x="290" y="284">AI Solutions</text></g>
+        <g><rect class="pop" data-delay="1700" x="120" y="315" width="340" height="52" rx="12" fill="#eaf0fe" stroke="#2f6fed" stroke-width="4"/>
+           <text class="t-s center tx-blue fade" data-delay="1850" x="290" y="349">SEAP (many boxes)</text></g>
+        <text class="t-s center tx-amber fade" data-delay="2200" x="290" y="405">↑ all of this = AI Delivery</text>
+        <text class="t-s center tx-muted fade" data-delay="2450" x="290" y="440">critical path: untouched</text>
+        <!-- client column -->
+        <text class="t-s center tx-coral fade" data-delay="3000" x="710" y="160">client side · gates</text>
+        <g><rect class="pop" data-delay="3300" x="540" y="185" width="360" height="182" rx="14" fill="#fdeee9" stroke="#e8503a" stroke-width="5"/>
+           <text class="t-h center tx-coral fade" data-delay="3600" x="720" y="262">Quantum Leap</text>
+           <text class="t-s center tx-muted fade" data-delay="3900" x="720" y="312">moves the gates</text></g>
+        <text class="t-s center tx-coral fade" data-delay="4400" x="710" y="410">critical path: this is it</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- 11 · CLOSING -->
+  <section class="scene" data-dur="8000" data-sub="Shrink all the boxes you want. Only moving the gates compresses the project — and that takes the client.">
+    <svg class="board" viewBox="0 0 1000 620">
+      <g filter="url(#sketch)">
+        <text class="t-m center fade" data-delay="200" x="500" y="190">Shrink all the boxes</text>
+        <text class="t-m center tx-blue fade" data-delay="600" x="500" y="242">you want.</text>
+        <text class="t-m center fade" data-delay="1400" x="500" y="322">Only moving the gates</text>
+        <text class="t-m center tx-coral fade" data-delay="1800" x="500" y="374">compresses the project.</text>
+        <path class="ink amber draw" data-delay="2500" data-dur="900"
+              d="M250 430 Q500 458 760 424 Q680 446 420 442 Q320 442 250 430"/>
+        <text class="t-s center tx-muted fade" data-delay="3300" x="500" y="530">— The Chunking Project Theory</text>
+      </g>
+    </svg>
+  </section>
+
+</div>
+
+<div id="caption"></div>
+<div id="bar"><div id="fill"></div></div>
+<div id="controls">
+  <button id="prev" title="Previous (←)">◀</button>
+  <button id="play" title="Play / Pause (space)">❚❚</button>
+  <button id="next" title="Next (→)">▶</button>
+  <button id="replay" title="Replay (R)">↻ replay</button>
+  <button id="mute" title="Mute / Unmute (M)">🔊</button>
+  <span id="counter">1 / 13</span>
+  <span class="hint">space=play/pause · ←/→=scene · M=mute · R=replay</span>
+</div>
+
+<script>
+(function(){
+  const scenes   = Array.from(document.querySelectorAll('.scene'));
+  const caption  = document.getElementById('caption');
+  const fill     = document.getElementById('fill');
+  const counter  = document.getElementById('counter');
+  const playBtn  = document.getElementById('play');
+  const muteBtn  = document.getElementById('mute');
+  const durs     = scenes.map(s => parseInt(s.dataset.dur,10) || 5000);
+  const total    = durs.reduce((a,b)=>a+b,0);
+  const cumBefore= durs.map((_,i)=> durs.slice(0,i).reduce((a,b)=>a+b,0));
+
+  let idx = 0;
+  let playing = true;
+  let sceneT0 = 0;        // performance.now() when current scene (re)started counting
+  let accrued = 0;        // ms already counted for current scene (across pauses)
+
+  /* ---- narration (Web Speech API, self-contained, no external audio) ---- */
+  const synth   = window.speechSynthesis;
+  const hasTTS  = !!synth;
+  let muted     = false;
+  let started   = false;   // browsers block audio until first user gesture
+  let speechDone= true;    // gates scene advance when audio is on
+  let voice     = null;
+  const LEAD_MS = 450;     // let the drawing begin before the voice starts
+
+  function pickVoice(){
+    if (!hasTTS) return;
+    const vs = synth.getVoices();
+    voice = vs.find(v => /en[-_]GB/i.test(v.lang) && /female|Google|Serena|Kate|Libby|Sonia/i.test(v.name))
+         || vs.find(v => /^en[-_]US/i.test(v.lang) && /Google|Samantha|Jenny|Aria/i.test(v.name))
+         || vs.find(v => /^en/i.test(v.lang))
+         || vs[0] || null;
+  }
+  if (hasTTS){
+    pickVoice();
+    synth.onvoiceschanged = pickVoice;
+  }
+
+  let leadTimer = null;
+  let speakGen  = 0;       // generation guard: invalidates stale utterances on scene change
+  // Chrome's speech engine truncates long single utterances. Split into short
+  // clauses and chain them — each clause resets the engine's watchdog.
+  function splitClauses(text){
+    return text.match(/[^.!?;:]+[.!?;:]*/g) || [text];
+  }
+  function speak(text){
+    if (!hasTTS || muted || !started){ speechDone = true; return; }
+    synth.cancel();
+    clearTimeout(leadTimer);
+    speechDone = false;
+    const gen = ++speakGen;                 // this call owns generation `gen`
+    const clauses = splitClauses(text).map(s => s.trim()).filter(Boolean);
+    leadTimer = setTimeout(()=>{
+      if (gen !== speakGen || muted || !playing){ if(gen===speakGen) speechDone = true; return; }
+      let i = 0;
+      const sayNext = ()=>{
+        if (gen !== speakGen) return;        // scene changed — abandon quietly
+        if (i >= clauses.length){ speechDone = true; return; }
+        const u = new SpeechSynthesisUtterance(clauses[i++]);
+        if (voice) u.voice = voice;
+        u.rate = 0.98; u.pitch = 1.0; u.lang = voice ? voice.lang : 'en-US';
+        u.onend   = ()=>{ if (gen === speakGen) sayNext(); };
+        u.onerror = ()=>{ if (gen === speakGen) sayNext(); }; // skip broken clause, keep going
+        synth.speak(u);
+      };
+      sayNext();
+    }, LEAD_MS);
+  }
+
+  function playAnims(scene){
+    // draw-on paths
+    scene.querySelectorAll('.draw').forEach(el=>{
+      let len = 300;
+      try { len = el.getTotalLength() || 300; } catch(e){}
+      const delay = parseFloat(el.dataset.delay || 0);
+      const dur   = parseFloat(el.dataset.dur   || 900);
+      el.style.transition = 'none';
+      el.style.strokeDasharray  = len;
+      el.style.strokeDashoffset = len;
+      el.getBoundingClientRect(); // reflow
+      el.style.transition = `stroke-dashoffset ${dur}ms cubic-bezier(.65,0,.35,1) ${delay}ms`;
+      el.style.strokeDashoffset = '0';
+    });
+    // pop / fade elements — restart CSS animation
+    scene.querySelectorAll('.pop, .fade').forEach(el=>{
+      el.classList.remove('go');
+      const delay = parseFloat(el.dataset.delay || 0);
+      el.style.animationDelay = delay + 'ms';
+      void el.offsetWidth; // reflow
+      el.classList.add('go');
+    });
+  }
+
+  function activate(i){
+    idx = (i + scenes.length) % scenes.length;
+    scenes.forEach((s,k)=> s.classList.toggle('active', k===idx));
+    const s = scenes[idx];
+    playAnims(s);
+    // caption
+    caption.textContent = s.dataset.sub || '';
+    caption.classList.remove('show');
+    void caption.offsetWidth;
+    caption.classList.add('show');
+    counter.textContent = (idx+1) + ' / ' + scenes.length;
+    accrued = 0;
+    sceneT0 = performance.now();
+    speak(s.dataset.sub || '');
+  }
+
+  function next(){ activate(idx+1); }
+  function prev(){ activate(idx-1); }
+
+  function setPlaying(p){
+    playing = p;
+    playBtn.textContent = p ? '❚❚' : '▶';
+    if (p){ sceneT0 = performance.now(); }
+    else if (hasTTS){ speakGen++; synth.cancel(); clearTimeout(leadTimer); }
+  }
+
+  function loop(now){
+    if (playing){
+      const elapsed = accrued + (now - sceneT0);
+      const shown = Math.min(elapsed, durs[idx]);
+      fill.style.width = ((cumBefore[idx] + shown) / total * 100) + '%';
+      // advance only when the timed duration passed AND the narration finished
+      const audioGate = (muted || !started) ? true : speechDone;
+      if (elapsed >= durs[idx] && audioGate){
+        if (idx === scenes.length - 1){
+          setPlaying(false);       // stop at the end
+          fill.style.width = '100%';
+        } else {
+          next();
+        }
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+
+  // controls
+  playBtn.addEventListener('click', ()=>{
+    if (playing){
+      accrued += performance.now() - sceneT0; // bank progress
+      setPlaying(false);
+    } else {
+      if (idx === scenes.length-1 && accrued >= durs[idx]) { activate(0); }
+      setPlaying(true);
+    }
+  });
+  document.getElementById('next').addEventListener('click', ()=>{ next(); setPlaying(true); });
+  document.getElementById('prev').addEventListener('click', ()=>{ prev(); setPlaying(true); });
+  document.getElementById('replay').addEventListener('click', ()=>{ activate(0); setPlaying(true); });
+
+  function setMuted(m){
+    muted = m;
+    muteBtn.textContent = m ? '🔇' : '🔊';
+    if (m && hasTTS){ speakGen++; synth.cancel(); clearTimeout(leadTimer); speechDone = true; }
+    else if (!m && playing){ speak(scenes[idx].dataset.sub || ''); } // start narrating current scene
+  }
+  muteBtn.addEventListener('click', ()=> setMuted(!muted));
+
+  // Start gate: browsers block speech until a user gesture.
+  // Hold on scene 1 until the user clicks, then begin with narration.
+  const gate = document.getElementById('startgate');
+  function beginShow(){
+    if (started) return;
+    started = true;
+    gate.classList.add('hide');
+    setTimeout(()=>gate.remove(), 500);
+    activate(0);            // restart scene 1 anims cleanly
+    setPlaying(true);
+    if (hasTTS && !muted) speak(scenes[0].dataset.sub || '');
+  }
+  gate.addEventListener('click', beginShow);
+
+  document.addEventListener('keydown', e=>{
+    if (!started){ beginShow(); return; }   // any key also starts the show
+    if (e.code === 'Space'){ e.preventDefault(); playBtn.click(); }
+    else if (e.code === 'ArrowRight'){ next(); setPlaying(true); }
+    else if (e.code === 'ArrowLeft'){ prev(); setPlaying(true); }
+    else if (e.key === 'r' || e.key === 'R'){ activate(0); setPlaying(true); }
+    else if (e.key === 'm' || e.key === 'M'){ setMuted(!muted); }
+  });
+
+  // prime scene 1 visuals behind the gate, but hold playback until user clicks
+  activate(0);
+  setPlaying(false);
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -88,6 +88,35 @@ La aceleración por IA no elimina el camino crítico del cliente. Solo cambia qu
 - Dimensionar el proyecto por la velocidad del implementador (y no por el ritmo del cliente) lleva a sobredimensionar el equipo y a expectativas irreales de plazo.
 - La palanca real de gestión no es "más velocidad", sino **ajustar el equipo al ritmo de las dependencias del cliente**.
 
+## Dos palancas de aceleración: AI Fluency y AI Solutions
+
+La teoría nombra **dos palancas** distintas con las que la IA encoge el trabajo interno de un chunk. Son **independientes**: un chunk puede acelerarse con una, con la otra, o con ambas.
+
+### AI Fluency
+
+- **Qué es** — la capacidad de los integradores (las personas) de usar elementos **básicos** de IA y saber **cuándo** usarlos.
+- **Nivel** — horizontal, una habilidad humana. Manejar la IA "como si fuera Excel".
+- **IA básica** = nivel prompt / LLM, transcripción, automatización simple.
+- **Ejemplos** — ya nadie toma notas: se transcribe y se automatiza. Ante un problema donde una IA básica ayuda, saber reconocerlo, aplicarla y manejarse mínimamente.
+- Es una **alfabetización base**, no un producto.
+
+### AI Solutions
+
+- **Qué es** — soluciones **completas** que aceleran un chunk de punta a punta, creadas con IA y que a su vez pueden usar IA. A todos los efectos, **assets basados en IA**.
+- **Nivel** — un escalón de abstracción **por encima** de la fluency. Empaquetadas.
+- **Qué cuenta** — cualquier solución IA end-to-end que resuelva el chunk: propia o de terceros, genérica o vertical.
+- **Ejemplos (stack actual)** — Setup Agents / AI Driven Framework (CDF-native: extracción de epics, field mapping, sizing, generación de tech enablers), Slackbot (guías técnicas, riesgos y modelos de datos en una sesión), LucidAI (Story Maps visuales dentro de Lucidchart), **OAT (Org Assessment Tool)** — herramienta creada por Servicios Profesionales de Iberia que analiza el estado, la customización y la configuración de una org del cliente; reduce un trabajo de muchas semanas a días.
+
+### Relación entre ambas
+
+Son **dos palancas independientes**. Cada una acelera el chunk por su cuenta; no hay jerarquía obligatoria entre ellas.
+
+### Efecto sobre el modelo de puertas
+
+El efecto **principal** de ambas palancas es **encoger la caja** (el trabajo interno). Pero, de forma **secundaria, ambas pueden reducir la fricción de las puertas**: no *abren* la puerta —eso solo lo hace el cliente— pero pueden hacer que el cliente la abra **antes**. Un integrador con fluency prepara un artefacto claro y listo para decidir, y la aprobación tarda un día en vez de una semana; un AI Solution pre-estructura lo que el cliente debe entregar, y el input llega más limpio y más rápido.
+
+La puerta sigue siendo del cliente y sigue en el camino crítico. La buena práctica solo **recorta su latencia**, no la elimina.
+
 ## Taxonomía de chunks (v2)
 
 Cada chunk se describe por su **puerta de entrada** (qué abre el cliente para empezar), su **trabajo interno** (color según qué lo topa) y su **puerta de salida** (qué abre el cliente para cerrar). Las herramientas mostradas son el stack actual en uso.
@@ -116,6 +145,48 @@ Leyenda:
 - 🔒 — los dos bloqueos crónicos: **specs de API** (integraciones) y **datos limpios** (migración).
 
 Lo que revela la tabla: **casi todo el trabajo interno es verde** — la IA lo aplasta. El problema nunca es el color del trabajo. El problema es que **las puertas (entrada + salida) son casi todas del cliente** y no comprimen. Ahí vive el camino crítico.
+
+## Encaje en Salesforce: SEAP y Quantum Leap
+
+El modelo de puertas separa dos ejes de acción que la industria confunde: **encoger las cajas** (lado oferta, del integrador) y **mover las puertas** (lado cliente, el único que toca el camino crítico). Dos iniciativas de Salesforce se colocan, cada una, en un eje distinto.
+
+### SEAP — el AI Solution que aspira a cubrir todos los chunks
+
+- **Qué es** — una **multitool** que llama al LLM haciéndole **adoptar roles** y guarda automáticamente en **memoria** lo que se va haciendo. Aspira a situarse **por encima de todos los project chunks** y resolver varios de golpe.
+- **Dónde encaja** — es un **AI Solution** (mismo eje que Setup Agents, Slackbot, LucidAI, OAT), solo que con **mayor alcance**: en vez de encoger una caja, intenta encoger **muchas cajas a la vez**.
+- **Lo que la teoría dice de él** — SEAP **no cambia las puertas** ni el hecho de que **el cliente no puede ir más deprisa de lo que va**. Comprime el lado oferta a mayor escala; el camino crítico —que vive en las puertas del cliente— **queda intacto**. Sigue siendo, geométricamente, encoger cajas.
+
+### Quantum Leap — el programa que sí mueve las puertas
+
+- **Qué es** — el **programa global de Servicios Profesionales** para transformar el modelo de entrega hacia una metodología **AI-native**. No es "usar herramientas de IA": es un **rediseño completo del operating model**.
+- **Lo que la teoría dice de él** — Quantum Leap es una metodología de **compromiso bilateral**:
+  - el **cliente** se compromete a **mover y acortar sus dependencias** (abrir las puertas antes y más juntas);
+  - **Salesforce** se compromete a **usar agentes para optimizar todos los chunks al máximo** (encoger todas las cajas).
+- **Por qué es distinto** — es la **única palanca de la teoría que actúa sobre las puertas**, no sobre las cajas. Y solo puede hacerlo porque es **bilateral**: las puertas son del cliente, así que moverlas exige su compromiso explícito. Por eso Quantum Leap es lo único que puede acercarse a comprimir un proyecto **a nivel de proyecto**, no solo dentro de los chunks.
+- **El gran reto** — alinear los **compromisos de velocidad de ambas partes en el contrato**. Mover puertas no es una buena intención: es una obligación contractual recíproca (el cliente ata su ritmo de apertura, Salesforce ata su optimización). Sin ese anclaje contractual, no hay Quantum Leap.
+
+### Sin Quantum Leap: AI Delivery (y a dónde va la aceleración)
+
+Cuando la IA encoge las cajas pero **nadie mueve las puertas**, lo que queda es **AI Delivery**: la IA ayuda a entregar más rápido *dentro* de los chunks, pero el plazo del proyecto **no baja** —sigue topado por las puertas del cliente.
+
+La capacidad liberada no desaparece; **se reconvierte**. Como el tiempo de calendario no se puede recuperar, el margen ganado dentro de las cajas se gasta en una de dos cosas:
+
+1. **Más scope** — se mete más trabajo en el mismo plazo.
+2. **Más calidad** — se pule más el mismo scope en el mismo plazo.
+
+Es decir: **AI Delivery cambia *qué* entregas (más o mejor), no *cuándo* lo entregas.** Solo Quantum Leap —moviendo puertas por contrato— cambia el *cuándo*.
+
+### El mapa completo
+
+| Palanca | Eje | Qué toca | ¿Mueve el camino crítico? |
+|---|---|---|---|
+| AI Fluency | oferta | encoge la caja (gente) | No (recorta latencia de puerta, no la mueve) |
+| AI Solutions | oferta | encoge la caja (assets) | No (íd.) |
+| **SEAP** | oferta | encoge **muchas cajas** a la vez | **No** |
+| **AI Delivery** | oferta | encoge cajas, puertas quietas → **más scope o más calidad** | **No** (default sin Quantum Leap) |
+| **Quantum Leap** | **cliente + oferta** | **mueve las puertas** (por contrato) + encoge cajas | **Sí** — único |
+
+Corolario: por muchas cajas que encojas —una, varias o todas con SEAP— el proyecto sigue topado por las puertas. Sin acuerdo, ese es el mundo de **AI Delivery**: la aceleración se reinvierte en **scope o calidad**, no en plazo. Solo un acuerdo que **mueva las puertas contractualmente** (Quantum Leap) cambia el camino crítico. Todo lo demás optimiza el lado que no era el cuello de botella.
 
 ## Preguntas abiertas (para completar la teoría)
 
